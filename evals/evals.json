@@ -1,0 +1,61 @@
+{
+  "skill_name": "salesblink-api-v1",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create a new list called 'Q2 Prospects' with email verification enabled and add 3 contacts: john@example.com, jane@example.com, bob@example.com. Then tell me the list ID.",
+      "expected_output": "A list is created with verification=true, 3 contacts are added with PascalCase field names, and the list UUID is returned.",
+      "assertions": [
+        "The POST /lists payload includes name: 'Q2 Prospects' and verification: true",
+        "The POST /contacts payload uses PascalCase field names (Email, First_Name)",
+        "The contact array has exactly 3 entries",
+        "The agent explicitly warns the user that enabling verification is irreversible"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Create a sequence named 'Product Launch' with sender ID sender-123-uuid, list ID list-456-uuid, and 2 steps: an intro email using template 507f1f77bcf86cd799439011, then a 3-day delay, then a follow-up email using template 507f1f77bcf86cd799439012. Launch it now.",
+      "expected_output": "A sequence is created with the correct steps array, senders as comma-separated string, paused: false, and launchTimingMode: 'now'.",
+      "assertions": [
+        "The steps array has exactly 3 items in order: email, delay, email",
+        "Each email step includes a template_id (MongoDB ObjectId format)",
+        "The senders field is a string, not an array",
+        "The payload includes paused: false and launchTimingMode: 'now'"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I have a CSV with 200 contacts. Add them all to my list list-abc-uuid. Make sure to remove duplicates.",
+      "expected_output": "The agent splits contacts into batches of 500 max, sends multiple POST /contacts requests with remove_duplicates: true, and includes 4-second delays between batch requests.",
+      "assertions": [
+        "No single request exceeds 500 contacts",
+        "remove_duplicates is set to true in each batch",
+        "The agent mentions rate limit awareness (15 POST/min)",
+        "Contact fields use PascalCase naming convention"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Reply to the inbox message msg-xyz-123 with: 'Thanks for your interest! Let's schedule a call next week.' CC my manager at manager@company.com.",
+      "expected_output": "A POST request is made to /inbox/msg-xyz-123/reply with HTML content and cc field.",
+      "assertions": [
+        "The endpoint URL includes the messageId path parameter",
+        "The payload includes content as a string",
+        "The payload includes cc: 'manager@company.com'",
+        "No attempt is made to specify a from/sender address"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Get me all email open events from the last 30 days for sequence seq-123-uuid. Paginate through all results.",
+      "expected_output": "GET requests to /opens with since=timestamp-30-days-ago, per_page=100, and sequential page numbers. The agent paginates until no more results.",
+      "assertions": [
+        "The endpoint is /opens (not /sent or /clicks)",
+        "Query params use per_page and page (not limit/skip)",
+        "The since parameter is a millisecond timestamp from 30 days ago",
+        "sequence_id filter is included in the query",
+        "The agent implements pagination loop (page 1, 2, 3...) until empty"
+      ]
+    }
+  ]
+}
