@@ -15,7 +15,7 @@
 **POST** `/templates`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 - `Content-Type`: `application/json`
 
 Body:
@@ -59,7 +59,7 @@ Response includes `cold_email_score`:
 **PATCH** `/templates/:id` (ObjectId)
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 - `Content-Type`: `application/json`
 
 Body:
@@ -88,7 +88,7 @@ Body:
 **PUT** `/templates/:id/archive` (ObjectId)
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 - `Content-Type`: `application/json`
 
 Body:

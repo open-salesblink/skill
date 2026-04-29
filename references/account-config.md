@@ -5,7 +5,7 @@
 **GET** `/domains`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 
 List custom tracking domains for the account.
 
@@ -14,7 +14,7 @@ List custom tracking domains for the account.
 **GET** `/signatures`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 
 List email signatures.
 
@@ -25,6 +25,6 @@ List email signatures.
 **GET** `/warmup-links`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 
 List warmup link configurations.

@@ -16,7 +16,7 @@
 **GET** `/lists/:id/leads?limit=100&skip=0`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 
 Query params: `limit` (max 100), `skip`
 
@@ -25,7 +25,7 @@ Query params: `limit` (max 100), `skip`
 **POST** `/contacts`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 - `Content-Type`: `application/json`
 
 Body:
@@ -72,7 +72,7 @@ Each contact object:
 **POST** `/contacts/remove`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 - `Content-Type`: `application/json`
 
 Body:
@@ -93,7 +93,7 @@ Body:
 **PATCH** `/leads/:id` (UUID)
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 - `Content-Type`: `application/json`
 
 Body:
@@ -114,7 +114,7 @@ If updating `Email`, it is automatically lowercased.
 **PUT** `/leads/:id/move` (UUID)
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 - `Content-Type`: `application/json`
 
 Body:
@@ -131,7 +131,7 @@ Body:
 **PUT** `/contacts/:id/archive`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 - `Content-Type`: `application/json`
 
 Body:

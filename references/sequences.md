@@ -17,7 +17,7 @@
 **POST** `/sequences`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 - `Content-Type`: `application/json`
 
 Body:
@@ -113,7 +113,7 @@ Required fields marked with ✅:
 **PATCH** `/sequences/:id` (UUID)
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 - `Content-Type`: `application/json`
 
 Body:
@@ -132,7 +132,7 @@ Accepts the same fields as create (all optional). Additionally used to **pause/r
 **POST** `/sequences/:id/clone` (UUID)
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 
 Creates a paused duplicate of an existing sequence.
 
@@ -141,7 +141,7 @@ Creates a paused duplicate of an existing sequence.
 **PUT** `/sequences/:id/archive` (UUID)
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 - `Content-Type`: `application/json`
 
 Body:

@@ -16,7 +16,7 @@
 **POST** `/lists`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 - `Content-Type`: `application/json`
 
 Body:
@@ -49,7 +49,7 @@ Required fields marked with ✅:
 **PATCH** `/lists/:id` (UUID)
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 - `Content-Type`: `application/json`
 
 Body:
@@ -79,7 +79,7 @@ Body:
 **PUT** `/lists/:id/archive`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 - `Content-Type`: `application/json`
 
 Body:

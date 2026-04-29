@@ -11,7 +11,7 @@
 **GET** `/reports`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 
 Query params:
 
@@ -27,4 +27,4 @@ Query params:
 **GET** `/reports?from=1715000000000&to=1717600000000`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`

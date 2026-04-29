@@ -15,7 +15,7 @@
 **GET** `/senders`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 
 Query params: `limit` (max 100), `skip`, `owned_by`
 
@@ -24,7 +24,7 @@ Query params: `limit` (max 100), `skip`, `owned_by`
 **POST** `/senders`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 - `Content-Type`: `application/json`
 
 Body:
@@ -75,7 +75,7 @@ Body:
 **POST** `/senders/bulk`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 - `Content-Type`: `multipart/form-data`
 
 Upload a CSV file via FormData with field name `csvFile`.
@@ -85,7 +85,7 @@ Upload a CSV file via FormData with field name `csvFile`.
 **POST** `/oauth/google`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 
 Returns an `auth_url` that the user must visit to authorize Gmail access.
 
@@ -102,6 +102,6 @@ Response:
 **POST** `/oauth/outlook`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 
 Returns an `auth_url` for Microsoft Outlook authorization.

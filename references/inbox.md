@@ -15,7 +15,7 @@
 
 Headers:
 
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 
 Query params:
 
@@ -45,7 +45,7 @@ Response includes `data.result` (thread array), `totalCount`, `count`, and `mess
 
 Headers:
 
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 
 Returns all messages in a conversation thread, sorted newest first.
 
@@ -55,7 +55,7 @@ Returns all messages in a conversation thread, sorted newest first.
 
 Headers:
 
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 - `Content-Type`: `application/json`
 
 Body:
@@ -85,7 +85,7 @@ Body:
 
 Headers:
 
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 - `Content-Type`: `application/json`
 
 Body:

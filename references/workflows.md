@@ -9,7 +9,7 @@ Goal: Build a complete outreach campaign from scratch.
 **POST** `/lists`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 - `Content-Type`: `application/json`
 
 Body:
@@ -30,7 +30,7 @@ Extract `LIST_ID` from the response.
 **POST** `/contacts`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 - `Content-Type`: `application/json`
 
 Body:
@@ -50,7 +50,7 @@ Body:
 **POST** `/templates`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 - `Content-Type`: `application/json`
 
 Body:
@@ -69,7 +69,7 @@ Extract `TEMPLATE_1_ID` (MongoDB ObjectId). Repeat for follow-up templates.
 **GET** `/senders`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 
 Extract target `SENDER_ID` (UUID).
 
@@ -78,7 +78,7 @@ Extract target `SENDER_ID` (UUID).
 **POST** `/sequences`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 - `Content-Type`: `application/json`
 
 Body:
@@ -106,7 +106,7 @@ Goal: Duplicate an existing sequence and tweak it.
 **POST** `/sequences/:id/clone`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 
 Extract `NEW_SEQ_ID` from response.
 
@@ -115,7 +115,7 @@ Extract `NEW_SEQ_ID` from response.
 **PATCH** `/sequences/:id`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 - `Content-Type`: `application/json`
 
 Body:
@@ -135,7 +135,7 @@ Body:
 **PATCH** `/sequences/:id`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 - `Content-Type`: `application/json`
 
 Body:
@@ -155,7 +155,7 @@ Goal: Clean up old campaigns, lists, and templates.
 **PUT** `/sequences/:id/archive`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 - `Content-Type`: `application/json`
 
 Body:
@@ -168,7 +168,7 @@ Body:
 **PUT** `/lists/:id/archive`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 - `Content-Type`: `application/json`
 
 Body:
@@ -181,7 +181,7 @@ Body:
 **PUT** `/templates/:id/archive`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 - `Content-Type`: `application/json`
 
 Body:

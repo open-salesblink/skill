@@ -14,7 +14,7 @@
 **GET** `/inbox-placement`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 
 Query params:
 
@@ -36,7 +36,7 @@ Query params:
 **POST** `/inbox-placement`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 - `Content-Type`: `application/json`
 
 | Field | Type | Req | Description |
@@ -70,7 +70,7 @@ Headers:
 **POST** `/inbox-placement`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 - `Content-Type`: `application/json`
 
 Body:
@@ -91,7 +91,7 @@ Body:
 **POST** `/inbox-placement`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 - `Content-Type`: `application/json`
 
 Body:
@@ -113,7 +113,7 @@ Body:
 **POST** `/inbox-placement`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 - `Content-Type`: `application/json`
 
 Body:
@@ -139,7 +139,7 @@ Response for `from-outside`:
 **PUT** `/inbox-placement/:id/pause`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 
 Only works on **recurring** tests. Sets status to `stopped` and clears scheduling.
 
@@ -148,6 +148,6 @@ Only works on **recurring** tests. Sets status to `stopped` and clears schedulin
 **DELETE** `/inbox-placement/:id`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 
 Deletes the test and all associated tracking tasks.

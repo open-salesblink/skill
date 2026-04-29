@@ -1,13 +1,12 @@
 ---
 name: cold-email-salesblink
 description: >
-  Interact with the SalesBlink for cold email and sales outreach automation.
-  Use when the user needs to send cold emails, manage email lists, sequences, templates, senders,
-  leads, inbox replies, or campaign analytics via the SalesBlink API. Also use for
-  bulk contact imports, workspace management, or deliverability testing via HTTP requests.
-compatibility: >
-  Requires network access to run.salesblink.io and a SalesBlink API key.
-  Supports any HTTP client (curl, Node.js fetch, Python requests, PowerShell, etc.).
+  Run cold email sequences on autopilot and manage full sales outreach campaigns via the SalesBlink API.
+  Use this skill to build automated multi-step email campaigns (sequences), manage leads and email lists,
+  create reusable templates with merge variables and spintax, connect sending accounts (Gmail, Outlook, SMTP),
+  handle inbox replies, and track campaign analytics (opens, clicks, replies, sent).
+  Also supports bulk contact imports, email deliverability testing (inbox placement / spam checks),
+  sender warmup links, workspace/team management, and any HTTP request to the SalesBlink platform.
 ---
 
 # SalesBlink Public REST API v1.0.0
@@ -47,11 +46,11 @@ Use this skill when the user wants to:
 
 ## Authentication
 
-Ask the user for their SalesBlink API key: `https://run.salesblink.io/account/integration/api`
+Ask the user for their SALESBLINK_API_KEY: `https://run.salesblink.io/account/integration/api`
 
 Pass it in every request as the `Authorization` header (no "Bearer" prefix):
 
-**Header:** `Authorization: YOUR_API_KEY`
+**Header:** `Authorization: key-****`
 
 ## Rate Limits
 

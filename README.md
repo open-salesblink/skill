@@ -14,6 +14,147 @@ This skill enables AI agents to interact with SalesBlink for:
 - **Deliverability testing** — run inbox placement tests across providers
 - **Workspace & team management** — users, roles, folders, and account config
 
+
+## Claude Code Plugin
+
+### Installation
+
+Install from the GitHub repository:
+
+```bash
+claude /plugin install https://github.com/open-salesblink/skill
+```
+
+Or clone and load locally for development:
+
+```bash
+git clone https://github.com/open-salesblink/skill.git
+claude --plugin-dir ./skill
+```
+
+### Configuration
+
+Set your SalesBlink API key as an environment variable:
+
+```bash
+export SALESBLINK_API_KEY="key-****"
+```
+
+### Usage
+
+Once installed, invoke the skill:
+
+```bash
+/cold-email-salesblink:cold-email-salesblink
+```
+
+Run `/help` to verify the plugin is loaded and see all available skills.
+
+## Codex Plugin
+
+### Installation
+
+Install from the GitHub repository:
+
+```bash
+codex plugin install https://github.com/open-salesblink/skill
+```
+
+Or clone and load locally for development by adding it to a local marketplace:
+
+```bash
+git clone https://github.com/open-salesblink/skill.git
+```
+
+Then add a marketplace file at `$REPO_ROOT/.agents/plugins/marketplace.json` (repo-scoped) or `~/.agents/plugins/marketplace.json` (personal) pointing to the plugin directory.
+
+### Configuration
+
+Set your SalesBlink API key as an environment variable:
+
+```bash
+export SALESBLINK_API_KEY="key-****"
+```
+
+### Usage
+
+Once installed, invoke the skill by referencing the plugin namespace. Use the plugin to create sequences, manage contacts, check analytics, or run any SalesBlink workflow.
+
+## Gemini CLI Extension
+
+### Installation
+
+Clone the repository and link it for local development:
+
+```bash
+git clone https://github.com/open-salesblink/skill.git
+cd skill/.gemini-extension
+gemini extensions link .
+```
+
+Or install directly from the GitHub repository (when published as a release):
+
+```bash
+gemini extensions install https://github.com/open-salesblink/skill
+```
+
+### Configuration
+
+Set your SalesBlink API key as an environment variable:
+
+```bash
+export SALESBLINK_API_KEY="key-****"
+```
+
+When you first use the extension, Gemini CLI will prompt you to enter the API key and store it securely in the system keychain.
+
+### Usage
+
+Once linked, restart Gemini CLI. The extension automatically loads `GEMINI.md` context and discovers the bundled agent skill. Ask Gemini to perform any SalesBlink workflow, such as:
+
+- "Create a cold email sequence for my SaaS product"
+- "Add these leads to a new list and launch a campaign"
+- "Check analytics for opens and replies from last week"
+- "Run an inbox placement test for my template"
+
+## OpenClaw (via ClawHub)
+
+### Installation
+
+Install from ClawHub using the CLI:
+
+```bash
+openclaw skills install cold-email-salesblink
+```
+
+Or install by prompt:
+
+```text
+Install the skill "Cold Email Outreach with SalesBlink" (sheksushant/cold-email-salesblink) from ClawHub.
+```
+
+**Skill page:** https://clawhub.ai/sheksushant/cold-email-salesblink
+
+### Configuration
+
+Set your SalesBlink API key as an environment variable:
+
+```bash
+export SALESBLINK_API_KEY="key-****"
+```
+
+### Post-Install Setup
+
+After installation, inspect the skill metadata to verify requirements. This skill requires:
+
+- `SALESBLINK_API_KEY` — your SalesBlink API key from https://run.salesblink.io/account/integration/api
+
+No additional environment variables or external dependencies are required. Once the API key is set, the skill is ready to use.
+
+### Usage
+
+Invoke the skill to create sequences, manage contacts, check analytics, or run any SalesBlink workflow.
+
 ## Base URL
 
 ```
@@ -26,31 +167,7 @@ https://run.salesblink.io/api/public/v1.0.0
 2. Pass it in every request as the `Authorization` header (no "Bearer" prefix):
 
 ```
-Authorization: YOUR_API_KEY
-```
-
-## Directory Structure
-
-```
-salesblink-api-v1/
-├── SKILL.md                          # Skill manifest & quick reference
-├── README.md                         # This file
-├── evals/
-│   └── evals.json                    # Evaluation scenarios for the skill
-└── references/
-    ├── lists.md                      # List & lead-container endpoints
-    ├── contacts.md                   # Contact/lead CRUD endpoints
-    ├── templates.md                  # Email template endpoints
-    ├── sequences.md                  # Sequence (campaign) endpoints
-    ├── senders.md                    # Email sender & OAuth endpoints
-    ├── inbox.md                      # Inbox, threads & reply endpoints
-    ├── activity.md                   # Opens, clicks, replies, sent events
-    ├── organization.md               # Users & workspaces
-    ├── folders.md                    # Folder management
-    ├── account-config.md             # Domains, signatures, warmup links
-    ├── reports.md                    # Aggregated activity reports
-    ├── inbox-placement.md            # Deliverability / seed tests
-    └── workflows.md                  # End-to-end campaign examples
+Authorization: SALESBLINK_API_KEY
 ```
 
 ## Pagination

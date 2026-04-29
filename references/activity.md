@@ -47,9 +47,9 @@ For clicks and replies, `template_name` is also included.
 **GET** `/opens?sequence_id=SEQ_ID&per_page=100&page=1`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 
 **GET** `/replies?since=TIMESTAMP_30_DAYS_AGO&per_page=100`
 
 Headers:
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`

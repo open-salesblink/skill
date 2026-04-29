@@ -13,7 +13,7 @@
 
 Headers:
 
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 
 ## Create Folder
 
@@ -21,7 +21,7 @@ Headers:
 
 Headers:
 
-- `Authorization`: `YOUR_API_KEY`
+- `Authorization`: `SALESBLINK_API_KEY`
 - `Content-Type`: `application/json`
 
 Body:
