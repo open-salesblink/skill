@@ -1,194 +1,107 @@
-# SalesBlink API Agent Skill
+# SalesBlink Cold Email Skill
 
-An agent skill for automating cold email and sales outreach via the [SalesBlink](https://salesblink.io) Public REST API.
+Run cold email sequences and sales outreach on autopilot via the [SalesBlink](https://salesblink.io) API. Works with any AI agent.
 
-## Overview
+---
 
-This skill enables AI agents to interact with SalesBlink for:
+## Install in 30 seconds
 
-- **Cold email campaigns** — create sequences, templates, and launch outreach
-- **Lead management** — build lists, import contacts in bulk, move and update leads
+### 1. Get your API key
+Grab your key from [`run.salesblink.io/account/integration/api`](https://run.salesblink.io/account/integration/api).
+
+### 2. Install the skill
+
+**Any agent (npx)**
+```bash
+npx skills add open-salesblink/skill
+```
+
+**Claude Code**
+```bash
+claude /plugin install https://github.com/open-salesblink/skill
+```
+
+**OpenClaw / ClawHub**
+```bash
+openclaw skills install cold-email-salesblink
+```
+
+### 3. Set your API key
+```bash
+export SALESBLINK_API_KEY="key-****"
+```
+
+### 4. Start working
+
+- *"Create a cold email sequence for my SaaS product"*
+- *"Add these leads to a new list and launch a campaign"*
+- *"Check analytics for opens and replies from last week"*
+- *"Run an inbox placement test for my template"*
+
+---
+
+## What you can do
+
+- **Cold email campaigns** — build sequences, write templates, and launch outreach
+- **Lead management** — create lists, import contacts in bulk, move and update leads
 - **Sender management** — connect Gmail/Outlook via OAuth or SMTP/IMAP accounts
 - **Inbox & replies** — read threads, reply to prospects, mark conversations
 - **Analytics** — track opens, clicks, replies, and sent events
 - **Deliverability testing** — run inbox placement tests across providers
 - **Workspace & team management** — users, roles, folders, and account config
 
+---
 
-## Claude Code Plugin
+## Other platforms
 
-### Installation
-
-Install from the GitHub repository:
-
-```bash
-claude /plugin install https://github.com/open-salesblink/skill
-```
-
-Or clone and load locally for development:
-
-```bash
-git clone https://github.com/open-salesblink/skill.git
-claude --plugin-dir ./skill
-```
-
-### Configuration
-
-Set your SalesBlink API key as an environment variable:
-
-```bash
-export SALESBLINK_API_KEY="key-****"
-```
-
-### Usage
-
-Once installed, invoke the skill:
-
-```bash
-/cold-email-salesblink:cold-email-salesblink
-```
-
-Run `/help` to verify the plugin is loaded and see all available skills.
-
-## Codex Plugin
-
-### Installation
-
-Install from the GitHub repository:
-
+### Codex
 ```bash
 codex plugin install https://github.com/open-salesblink/skill
 ```
+Invoke by referencing the plugin namespace.
 
-Or clone and load locally for development by adding it to a local marketplace:
-
+### Cursor
 ```bash
 git clone https://github.com/open-salesblink/skill.git
 ```
+Load the plugin from the cloned directory in Cursor's plugin settings.
 
-Then add a marketplace file at `$REPO_ROOT/.agents/plugins/marketplace.json` (repo-scoped) or `~/.agents/plugins/marketplace.json` (personal) pointing to the plugin directory.
-
-### Configuration
-
-Set your SalesBlink API key as an environment variable:
-
+### Gemini CLI
 ```bash
-export SALESBLINK_API_KEY="key-****"
+gemini extensions install https://github.com/open-salesblink/skill
 ```
-
-### Usage
-
-Once installed, invoke the skill by referencing the plugin namespace. Use the plugin to create sequences, manage contacts, check analytics, or run any SalesBlink workflow.
-
-## Gemini CLI Extension
-
-### Installation
-
-Clone the repository and link it for local development:
-
+Or clone and link locally:
 ```bash
 git clone https://github.com/open-salesblink/skill.git
 cd skill/.gemini-extension
 gemini extensions link .
 ```
+Restart Gemini CLI after linking. The extension auto-loads `GEMINI.md` context.
 
-Or install directly from the GitHub repository (when published as a release):
+> **Note:** All platforms above require the same `SALESBLINK_API_KEY` environment variable shown in Step 3.
 
-```bash
-gemini extensions install https://github.com/open-salesblink/skill
-```
+---
 
-### Configuration
+## API Quick Reference
 
-Set your SalesBlink API key as an environment variable:
-
-```bash
-export SALESBLINK_API_KEY="key-****"
-```
-
-When you first use the extension, Gemini CLI will prompt you to enter the API key and store it securely in the system keychain.
-
-### Usage
-
-Once linked, restart Gemini CLI. The extension automatically loads `GEMINI.md` context and discovers the bundled agent skill. Ask Gemini to perform any SalesBlink workflow, such as:
-
-- "Create a cold email sequence for my SaaS product"
-- "Add these leads to a new list and launch a campaign"
-- "Check analytics for opens and replies from last week"
-- "Run an inbox placement test for my template"
-
-## OpenClaw (via ClawHub)
-
-### Installation
-
-Install from ClawHub using the CLI:
-
-```bash
-openclaw skills install cold-email-salesblink
-```
-
-Or install by prompt:
-
-```text
-Install the skill "Cold Email Outreach with SalesBlink" (sheksushant/cold-email-salesblink) from ClawHub.
-```
-
-**Skill page:** https://clawhub.ai/sheksushant/cold-email-salesblink
-
-### Configuration
-
-Set your SalesBlink API key as an environment variable:
-
-```bash
-export SALESBLINK_API_KEY="key-****"
-```
-
-### Post-Install Setup
-
-After installation, inspect the skill metadata to verify requirements. This skill requires:
-
-- `SALESBLINK_API_KEY` — your SalesBlink API key from https://run.salesblink.io/account/integration/api
-
-No additional environment variables or external dependencies are required. Once the API key is set, the skill is ready to use.
-
-### Usage
-
-Invoke the skill to create sequences, manage contacts, check analytics, or run any SalesBlink workflow.
-
-## Base URL
-
+**Base URL**
 ```
 https://run.salesblink.io/api/public/v1.0.0
 ```
 
-## Authentication
-
-1. Get your API key from: `https://run.salesblink.io/account/integration/api`
-2. Pass it in every request as the `Authorization` header (no "Bearer" prefix):
-
+**Authentication**
+Pass your API key in the `Authorization` header with no "Bearer" prefix:
 ```
-Authorization: SALESBLINK_API_KEY
+Authorization: key-****
 ```
 
-## Pagination
-
+**Pagination**
 - Most list endpoints: `limit` (max 100) and `skip`
 - Activity endpoints (`/sent`, `/opens`, `/clicks`, `/replies`): `per_page` (max 100) and `page` (1-indexed)
 
 Always paginate — never assume a single request returns all data.
 
-## Quick Start: End-to-End Campaign
-
-See [`references/workflows.md`](references/workflows.md) for full examples. Here is the high-level flow:
-
-1. **Create a list** → `POST /lists`
-2. **Add contacts** → `POST /contacts` (batch up to 500, PascalCase fields)
-3. **Create templates** → `POST /templates` (merge vars like `{{first_name}}`)
-4. **Fetch senders** → `GET /senders`
-5. **Create sequence** → `POST /sequences` (steps: email → delay → email …)
-6. **Launch** → `PATCH /sequences/:id` with `paused: false` & `launchTimingMode: "now"`
-
-## Error Handling
+**Error Handling**
 
 | Status | Meaning       | Action                                                |
 |--------|---------------|-------------------------------------------------------|
@@ -201,15 +114,26 @@ See [`references/workflows.md`](references/workflows.md) for full examples. Here
 | 429    | Rate limited  | Wait 60s, then retry                                  |
 | 500    | Server error  | Retry once after 10s                                  |
 
+---
+
+## Quick Start: End-to-End Campaign
+
+See [`references/workflows.md`](references/workflows.md) for full examples. High-level flow:
+
+1. **Create a list** → `POST /lists`
+2. **Add contacts** → `POST /contacts` (batch up to 500, PascalCase fields)
+3. **Create templates** → `POST /templates` (merge vars like `{{first_name}}`)
+4. **Fetch senders** → `GET /senders`
+5. **Create sequence** → `POST /sequences` (steps: email → delay → email …)
+6. **Launch** → `PATCH /sequences/:id` with `paused: false` & `launchTimingMode: "now"`
+
+---
+
 ## Evaluations
 
-The [`evals/evals.json`](evals/evals.json) file contains test scenarios covering:
+The [`evals/evals.json`](evals/evals.json) file contains test scenarios covering list creation, bulk contact import, sequence creation, large CSV ingestion, inbox replies with CC, and paginated activity tracking.
 
-- List creation with verification and bulk contact import
-- Sequence creation with steps, senders, and launch timing
-- Large CSV ingestion with batching and deduplication
-- Inbox reply with CC
-- Paginated activity tracking (opens over 30 days)
+---
 
 ## Compatibility
 
