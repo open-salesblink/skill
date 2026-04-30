@@ -92,6 +92,10 @@ gemini extensions link .
 
 Restart Gemini CLI after linking. The extension auto-loads `GEMINI.md` context.
 
+### MCP
+
+Visit https://mcp.salesblink.io to connect via MCP.
+
 > **Note:** All platforms above require the same `SALESBLINK_API_KEY` environment variable shown in Step 3.
 
 ---
@@ -160,3 +164,4 @@ The [`evals/evals.json`](evals/evals.json) file contains test scenarios covering
 ## License
 
 This skill is provided as-is for use with the SalesBlink platform. Refer to SalesBlink's terms of service for API usage policies.
+
