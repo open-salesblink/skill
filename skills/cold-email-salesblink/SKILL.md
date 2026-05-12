@@ -73,6 +73,37 @@ Pass it in every request as the `Authorization` header (no "Bearer" prefix):
 
 On `429 Too Many Requests`: wait at least 60 seconds before retrying. For batch operations, insert a 4-second delay between requests.
 
+## Public Signup
+
+**POST** `/signup`
+
+Create a new SalesBlink account. This is a public endpoint and does not require an API key. **Successful signup returns an API key**, allowing you to proceed with authenticated requests immediately.
+
+**Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "SecurePassword123",
+  "name": "John Doe"
+}
+```
+
+**Response Body:**
+```json
+{
+  "success": true,
+  "data": {
+    "account_id": "...",
+    "user_id": "...",
+    "api_key": "key-..."
+  }
+}
+```
+
+**Constraints:**
+- `password`: Min 8 characters, max 48 characters, at least one uppercase and one lowercase letter.
+- **Rate Limit**: 2 signups per day.
+
 ## Pagination
 
 Most list endpoints use `limit` (max 100) and `skip`. Activity endpoints (`/sent`, `/opens`, `/clicks`, `/replies`) use `per_page` (max 100) and `page` (1-indexed).
@@ -92,8 +123,8 @@ Read the relevant reference file before performing operations in that domain:
 - **Sequences & email campaigns** → [references/sequences.md](references/sequences.md)
   - Use these endpoints when the user wants to create or manage automated email campaigns (sequences). A sequence connects lists (who to email), senders (which accounts send), and templates (what to send) into a timed step-by-step workflow. Steps alternate between email sends and delay periods. Sequences can be launched, paused, resumed, cloned, or archived.
 
-- **Senders & OAuth** → [references/senders.md](references/senders.md)
-  - Use these endpoints when the user wants to connect or manage email sending accounts. A sender is an email account (SMTP/IMAP or OAuth-connected Gmail/Outlook) that sends emails on behalf of sequences. Multiple senders can be assigned to a sequence. Senders can also be organized into folders.
+- **Senders, OAuth & warmup links** → [references/senders.md](references/senders.md)
+  - Use these endpoints when the user wants to connect or manage email sending accounts. A sender is an email account (SMTP/IMAP or OAuth-connected Gmail/Outlook) that sends emails on behalf of sequences. Multiple senders can be assigned to a sequence. Senders can also be organized into folders. Warmup links are used in email warmup processes to improve deliverability.
 
 - **Inbox & replies** → [references/inbox.md](references/inbox.md)
   - Use these endpoints when the user wants to view or interact with email conversations. The inbox contains reply threads, sent emails, scheduled emails, and drafts. Each thread has a messageId. The user can reply to a lead's email, mark messages as read/unread, or classify outcomes.
@@ -107,8 +138,17 @@ Read the relevant reference file before performing operations in that domain:
 - **Folders** → [references/folders.md](references/folders.md)
   - Use these endpoints when the user wants to organize resources into folders. Folders have a type (list, template, sequence, or email-sender) and group related resources together for easier management.
 
-- **Domains, signatures & warmup links** → [references/account-config.md](references/account-config.md)
-  - Use these endpoints when the user wants to view account-level configuration. Custom tracking domains are used for click tracking in emails. Signatures are appended to outgoing emails. Warmup links are used in email warmup processes.
+- **Domains & signatures** → [references/account-config.md](references/account-config.md)
+  - Use these endpoints when the user wants to view account-level configuration. Custom tracking domains are used for click tracking in emails. Signatures are appended to outgoing emails.
+
+- **DFY domains & mailboxes** → [references/dfy.md](references/dfy.md)
+  - Use these endpoints when the user wants to purchase domains and provision mailboxes through the Done-For-You service. Start with `/domains/search` to find available domains, then place an order with Google Workspace, Outlook, or Azure mailboxes. Supports buying new domains or connecting existing ones.
+
+- **Billing & payment methods** → [references/billing.md](references/billing.md)
+  - Use these endpoints when the user wants to add or remove a saved payment card. Returns magic login links to the billing page.
+
+- **API Key Management** → [references/api-keys.md](references/api-keys.md)
+  - Use these endpoints when the user wants to manage API keys. Users can list all keys, create new keys, refresh an existing key (which generates a new one and revokes the old one), or delete a key.
 
 - **Reports** → [references/reports.md](references/reports.md)
   - Use these endpoints when the user wants to fetch aggregated activity reports over a date range. Reports combine data across campaigns into summary views.

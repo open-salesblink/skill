@@ -7,6 +7,8 @@
 | `/senders` | GET | List all connected senders (grouped by folder) |
 | `/senders` | POST | Add a single SMTP/IMAP sender |
 | `/senders/bulk` | POST | Bulk add senders via CSV upload |
+| `/senders/:id` | PATCH | Update sender settings (warmup, inbox, signature, tracking, etc.) |
+| `/warmup-links` | GET | List warmup link configurations |
 | `/oauth/google` | POST | Get Google OAuth URL for connecting Gmail |
 | `/oauth/outlook` | POST | Get Microsoft OAuth URL for connecting Outlook |
 
@@ -46,11 +48,11 @@ Body:
 | `from_email` | string | ✅ | Sender email address |
 | `password` | string | ✅ | SMTP/IMAP password |
 | `smtp_host` | string | ✅ | SMTP server hostname |
-| `smtp_port` | integer/string | ✅ | SMTP port (e.g., 587) |
+| `smtp_port` | integer/string | ✅ | SMTP port (e.g. 587) |
 | `from_name` | string | | Display name |
 | `user_name` | string | | SMTP username (defaults to `from_email`) |
 | `imap_host` | string | | IMAP hostname (omit for SMTP-only) |
-| `imap_port` | integer/string | | IMAP port (e.g., 993) |
+| `imap_port` | integer/string | | IMAP port (e.g. 993) |
 | `imap_user_name` | string | | IMAP username if different from SMTP |
 | `imap_password` | string | | IMAP password if different from SMTP |
 | `total_warmup_per_day` | integer | | Warmup emails per day (default: 5) |
@@ -79,6 +81,81 @@ Headers:
 - `Content-Type`: `multipart/form-data`
 
 Upload a CSV file via FormData with field name `csvFile`.
+
+## Update Sender
+
+**PATCH** `/senders/:id`
+
+Headers:
+- `Authorization`: `SALESBLINK_API_KEY`
+- `Content-Type`: `application/json`
+
+Pass any of the fields below to update specific sender settings. Only provided fields are updated.
+
+### Warmup fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `warmup_enabled` | boolean | Enable/disable warmup |
+| `warmup_urls` | array | Warmup link URLs |
+| `warmup_templates` | array | Warmup template IDs |
+| `auto_ramp_up_enabled` | boolean | Enable auto ramp-up |
+| `ramp_up_frequency` | integer | Ramp-up increment |
+| `max_daily_frequency` | integer | Max daily warmup emails |
+| `starting_warmup_frequency` | integer | Starting warmup frequency |
+| `open_rate` | integer | Target open rate % |
+| `spam_protection` | integer | Spam protection level |
+| `read_emulation` | integer | Read emulation level |
+| `warmup_keyword` | string | Warmup keyword/tag |
+
+### Sequence / sending fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `sequence_auto_ramp_up_enabled` | boolean | Enable sequence auto ramp-up |
+| `sequence_initial_daily_frequency` | integer | Initial daily sequence sends |
+| `sequence_ramp_up_frequency` | integer | Sequence ramp-up increment |
+| `sequence_max_daily_frequency` | integer | Max daily sequence sends |
+| `pause_cold_emails_when_health_low` | boolean | Pause cold emails when health is low |
+| `pause_cold_emails_health_threshold` | integer | Health threshold to pause at |
+
+### Inbox fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `inbox_enabled` | boolean | Enable inbox monitoring |
+| `inbox_path` | string | Inbox folder path |
+| `spam_path` | string | Spam folder path |
+
+### Other fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `signature` | string | Signature ID or name |
+| `reply_to` | string | Reply-to email address |
+| `dkim_identifier` | string | DKIM identifier |
+| `use_custom_tracking_domain` | boolean | Use custom tracking domain |
+| `tracking_domain` | string | Tracking domain ID |
+
+Response:
+```json
+{
+  "success": true,
+  "message": "Sender settings updated successfully",
+  "data": { ... }
+}
+```
+
+## Warmup Links
+
+**GET** `/warmup-links`
+
+Headers:
+- `Authorization`: `SALESBLINK_API_KEY`
+
+Query params: `limit` (max 100), `skip`
+
+List warmup link configurations. These URLs are used in sender warmup campaigns to improve deliverability.
 
 ## Google OAuth
 
