@@ -25,6 +25,13 @@ npx skills add open-salesblink/skill
 /plugin install cold-email-salesblink
 ```
 
+**Hermes**
+
+```bash
+hermes skills tap add open-salesblink/skill
+hermes skills install cold-email-salesblink
+```
+
 **OpenClaw / ClawHub**
 
 ```bash
