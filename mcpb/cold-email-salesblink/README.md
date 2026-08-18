@@ -2,6 +2,8 @@
 
 Run cold email sequences and full sales outreach on autopilot via the [SalesBlink](https://salesblink.io) public REST API, packaged as an [MCP Bundle](https://github.com/anthropics/mcpb) (`.mcpb`) for one-click installation in MCPB-compatible hosts (e.g. Claude for macOS/Windows).
 
+This bundle is built from the SalesBlink agent skill in [`open-salesblink/skill`](https://github.com/open-salesblink/skill). Prefer installing the skill directly? See the repo README for `npx skills`, Claude Code, OpenClaw, and Hermes install options.
+
 **[⬇ Download the latest cold-email-salesblink.mcpb](https://github.com/open-salesblink/skill/releases/latest/download/cold-email-salesblink.mcpb)** — open the file in your host and enter your `SALESBLINK_API_KEY` when prompted.
 
 ## What it does

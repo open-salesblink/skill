@@ -8,7 +8,7 @@
 [![Website](https://img.shields.io/badge/website-salesblink.io-orange)](https://salesblink.io)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-Run cold email sequences and sales outreach on autopilot via the [SalesBlink](https://salesblink.io) API. Works with any AI agent.
+Run cold email sequences and sales outreach on autopilot via the [SalesBlink](https://salesblink.io) API. Works with any AI agent — Claude, Claude Code, Claude Desktop, ChatGPT, OpenClaw, Cursor, Codex, Hermes, and more. Install it as an agent skill, or use the one-click `.mcpb` bundle for MCPB-compatible hosts.
 
 ---
 
@@ -31,6 +31,13 @@ npx skills add open-salesblink/skill
 ```bash
 /plugin marketplace add https://github.com/open-salesblink/skill
 /plugin install cold-email-salesblink
+```
+
+**Hermes**
+
+```bash
+hermes skills tap add open-salesblink/skill
+hermes skills install cold-email-salesblink
 ```
 
 **OpenClaw / ClawHub**
@@ -84,15 +91,19 @@ git clone https://github.com/open-salesblink/skill.git
 
 Load the plugin from the cloned directory in Cursor's plugin settings.
 
+### ChatGPT
+
+ChatGPT connects via MCP — visit https://mcp.salesblink.io and add SalesBlink as an MCP connector, or use the `.mcpb` bundle below in an MCPB-compatible host.
+
 ### MCP
 
 Visit https://mcp.salesblink.io to connect via MCP.
 
-### MCP Bundle (`.mcpb`)
+### Claude Desktop / MCP Bundle (`.mcpb`)
 
 [![Download MCPB](https://img.shields.io/badge/download-latest_.mcpb-blue)](https://github.com/open-salesblink/skill/releases/latest/download/cold-email-salesblink.mcpb)
 
-**[⬇ Download cold-email-salesblink.mcpb](https://github.com/open-salesblink/skill/releases/latest/download/cold-email-salesblink.mcpb)** — one-click install in MCPB-compatible hosts (e.g. Claude for macOS/Windows). Open the downloaded file and enter your `SALESBLINK_API_KEY` when prompted.
+**[⬇ Download cold-email-salesblink.mcpb](https://github.com/open-salesblink/skill/releases/latest/download/cold-email-salesblink.mcpb)** — one-click install of this skill in MCPB-compatible hosts (e.g. Claude for macOS/Windows). Open the downloaded file and enter your `SALESBLINK_API_KEY` when prompted.
 
 The bundle runs a local Node.js MCP server with hardened gateway tools plus the full bundled API reference. Source lives in [`mcpb/cold-email-salesblink/`](mcpb/cold-email-salesblink/). To build it yourself instead of downloading:
 
