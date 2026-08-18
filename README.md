@@ -2,7 +2,10 @@
 
 [![GitHub release](https://img.shields.io/github/v/release/open-salesblink/skill)](https://github.com/open-salesblink/skill/releases)
 [![Claude Desktop one-click install](https://img.shields.io/badge/Claude%20Desktop-one--click%20install-d97757)](https://github.com/open-salesblink/skill/releases/latest/download/cold-email-salesblink.mcpb)
+[![GitHub stars](https://img.shields.io/github/stars/open-salesblink/skill)](https://github.com/open-salesblink/skill)
+[![Last commit](https://img.shields.io/github/last-commit/open-salesblink/skill)](https://github.com/open-salesblink/skill/commits/main)
 [![Release downloads](https://img.shields.io/github/downloads/open-salesblink/skill/total)](https://github.com/open-salesblink/skill/releases)
+[![Website](https://img.shields.io/badge/website-salesblink.io-orange)](https://salesblink.io)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Run cold email sequences and sales outreach on autopilot via the [SalesBlink](https://salesblink.io) API. Works with any AI agent.
