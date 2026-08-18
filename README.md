@@ -96,6 +96,23 @@ Restart Gemini CLI after linking. The extension auto-loads `GEMINI.md` context.
 
 Visit https://mcp.salesblink.io to connect via MCP.
 
+### MCP Bundle (`.mcpb`)
+
+[![Download MCPB](https://img.shields.io/badge/download-latest_.mcpb-blue)](https://github.com/open-salesblink/skill/releases/latest/download/cold-email-salesblink.mcpb)
+
+**[⬇ Download cold-email-salesblink.mcpb](https://github.com/open-salesblink/skill/releases/latest/download/cold-email-salesblink.mcpb)** — one-click install in MCPB-compatible hosts (e.g. Claude for macOS/Windows). Open the downloaded file and enter your `SALESBLINK_API_KEY` when prompted.
+
+The bundle runs a local Node.js MCP server with hardened gateway tools plus the full bundled API reference. Source lives in [`mcpb/cold-email-salesblink/`](mcpb/cold-email-salesblink/). To build it yourself instead of downloading:
+
+```bash
+cd mcpb/cold-email-salesblink
+npm install --omit=dev
+npm test                            # protocol smoke test (no API key needed)
+npx @anthropic-ai/mcpb pack .       # produces cold-email-salesblink.mcpb
+```
+
+See [`mcpb/cold-email-salesblink/README.md`](mcpb/cold-email-salesblink/README.md) for tools, configuration, and security details.
+
 > **Note:** All platforms above require the same `SALESBLINK_API_KEY` environment variable shown in Step 3.
 
 ---

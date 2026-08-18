@@ -1,0 +1,94 @@
+{
+  "manifest_version": "0.3",
+  "name": "cold-email-salesblink",
+  "display_name": "SalesBlink Cold Email",
+  "version": "1.0.0",
+  "description": "Run cold email sequences and sales outreach on autopilot via the SalesBlink API: lists, contacts, templates, sequences, senders, inbox, analytics, and deliverability tests.",
+  "long_description": "SalesBlink Cold Email gives your AI assistant full access to the SalesBlink public REST API.\n\n- **Campaigns**: build automated multi-step email sequences, launch, pause, resume, clone, and archive them\n- **Leads**: create lists, import contacts in bulk (up to 500 per request), move and update leads\n- **Templates**: reusable emails with merge variables like {{first_name}}, spintax, and attachments\n- **Senders**: connect Gmail/Outlook via OAuth or add SMTP/IMAP accounts, organize them in folders\n- **Inbox**: read reply threads, reply to prospects, forward, mark read/unread, classify outcomes\n- **Analytics**: track sent, opens, clicks, and replies with overall, daily, lead-level, and per-mailbox stats\n- **Deliverability**: run inbox placement tests across Gmail, Outlook, and other providers\n- **Workspace**: manage users, roles, workspaces, folders, domains, signatures, billing, and API keys\n\nThe server ships the complete SalesBlink API reference docs as built-in tools, so the assistant can look up exact endpoints and payload shapes before making requests. All requests are authenticated with your SalesBlink API key.",
+  "author": {
+    "name": "FUTUREBLINK Inc.",
+    "url": "https://salesblink.io"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/open-salesblink/skill"
+  },
+  "homepage": "https://salesblink.io",
+  "documentation": "https://github.com/open-salesblink/skill",
+  "support": "https://github.com/open-salesblink/skill/issues",
+  "license": "MIT",
+  "keywords": [
+    "cold-email",
+    "sales",
+    "outreach",
+    "email-sequences",
+    "lead-generation",
+    "deliverability",
+    "salesblink"
+  ],
+  "privacy_policies": [
+    "https://salesblink.io/privacy-policy"
+  ],
+  "server": {
+    "type": "node",
+    "entry_point": "server/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": [
+        "${__dirname}/server/index.js"
+      ],
+      "env": {
+        "SALESBLINK_API_KEY": "${user_config.api_key}",
+        "SALESBLINK_MCPB_LOG_LEVEL": "${user_config.log_level}"
+      }
+    }
+  },
+  "tools": [
+    {
+      "name": "salesblink_request",
+      "description": "Make any authenticated HTTP request to the SalesBlink public API (GET/POST/PATCH/PUT/DELETE with path, query, and JSON body)."
+    },
+    {
+      "name": "salesblink_signup",
+      "description": "Create a new SalesBlink account (public endpoint) and receive an API key."
+    },
+    {
+      "name": "salesblink_list_reference_docs",
+      "description": "List the bundled SalesBlink API reference doc topics (lists, contacts, sequences, senders, inbox, analytics, ...)."
+    },
+    {
+      "name": "salesblink_get_reference_doc",
+      "description": "Read a bundled SalesBlink API reference doc with exact endpoints, payload shapes, and gotchas for one domain."
+    },
+    {
+      "name": "salesblink_check_auth",
+      "description": "Verify the configured SalesBlink API key by calling GET /account/verify."
+    }
+  ],
+  "compatibility": {
+    "platforms": [
+      "darwin",
+      "win32",
+      "linux"
+    ],
+    "runtimes": {
+      "node": ">=18.0.0"
+    }
+  },
+  "user_config": {
+    "api_key": {
+      "type": "string",
+      "title": "SalesBlink API Key",
+      "description": "Your SalesBlink API key (starts with key-). Get one at https://run.salesblink.io/account/integration/api — or leave blank and use the salesblink_signup tool to create an account.",
+      "sensitive": true,
+      "required": true
+    },
+    "log_level": {
+      "type": "string",
+      "title": "Log Level",
+      "description": "Server log verbosity: debug, info, warn, or error. Logs are written to stderr only.",
+      "default": "info",
+      "required": false
+    }
+  }
+}

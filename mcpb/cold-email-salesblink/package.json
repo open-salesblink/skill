@@ -1,0 +1,19 @@
+{
+  "name": "cold-email-salesblink",
+  "version": "1.0.0",
+  "description": "SalesBlink cold email outreach MCP server (MCPB bundle)",
+  "type": "module",
+  "main": "server/index.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "start": "node server/index.js",
+    "test": "node test/smoke.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.18.0",
+    "zod": "^3.25.0"
+  },
+  "license": "MIT"
+}
