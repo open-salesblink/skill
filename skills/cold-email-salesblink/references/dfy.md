@@ -106,7 +106,7 @@ Headers:
 }
 ```
 
-#### Azure (100 mailboxes per domain)
+#### Azure (30 to 100 mailboxes per buy domain)
 
 ```json
 {
@@ -116,7 +116,7 @@ Headers:
       "mailboxes": [
         { "username": "user001", "firstName": "User", "lastName": "001" },
         { "username": "user002", "firstName": "User", "lastName": "002" }
-        // ... 98 more mailboxes (exactly 100 total per domain)
+        // ... 30 to 100 mailboxes total per buy domain
       ]
     }
   ],
@@ -141,7 +141,7 @@ Headers:
 | ----------- | ------- | --- | ---------------------------------------------------------------------------------------------------------- |
 | `domain`    | string  | ✅  | Domain name to purchase or connect                                                                         |
 | `isConnect` | boolean |     | `false` = buy new domain (default), `true` = connect your own existing domain                              |
-| `mailboxes` | array   |     | Array of mailbox objects. Required for all provider types. Each domain needs ≥1 for google/outlook, exactly 100 for azure. Optional for connect-domain orders. |
+| `mailboxes` | array   |     | Array of mailbox objects. Required for buy domains: ≥1 for google/outlook, 30–100 for azure. Optional for connect-domain orders (admin mailbox auto-provisioned). |
 
 ### Mailbox object
 
@@ -154,9 +154,9 @@ Headers:
 ### Rules
 
 - You cannot mix buy and connect domains in the same order.
-- For **Google**, `password` is required. Each domain must have at least 1 mailbox in the `mailboxes` array.
-- For **Outlook**, each domain must have at least 1 mailbox in the `mailboxes` array.
-- For **Azure**, each domain must have exactly 100 mailboxes in the `mailboxes` array.
+- For **Google**, `password` is required for buy domains. Each buy domain must have at least 1 mailbox in the `mailboxes` array.
+- For **Outlook**, each buy domain must have at least 1 mailbox in the `mailboxes` array.
+- For **Azure**, each buy domain must have **30 to 100** mailboxes in the `mailboxes` array.
 - For **connect domains** (`isConnect: true`), no `mailboxes` array is needed in the request; the system will provision admin mailboxes automatically.
 - Connect domain orders return `nameservers` in the response. You must update your domain's nameservers before provisioning can begin.
 
@@ -231,7 +231,10 @@ Body:
 ```json
 {
   "domainName": "mybrand.com",
-  "emails": ["alice", "bob"],
+  "emails": [
+    { "username": "alice", "firstName": "Alice", "lastName": "Smith" },
+    { "username": "bob", "firstName": "Bob", "lastName": "Jones" }
+  ],
   "password": "SecurePass123!"
 }
 ```
@@ -239,7 +242,7 @@ Body:
 | Field        | Type   | Req | Description                              |
 | ------------ | ------ | --- | ---------------------------------------- |
 | `domainName` | string | ✅  | Domain in the order to add mailboxes to  |
-| `emails`     | array  | ✅  | Array of usernames (without `@domain`)   |
+| `emails`     | array  | ✅  | Array of mailbox objects, each with non-empty `username` (without `@domain`), `firstName`, and `lastName` |
 | `password`   | string |     | Password for new mailboxes (Google only) |
 
 Rules:
@@ -271,3 +274,6 @@ Response:
   }
 }
 ```
+
+
+Note: For POST /dfy/orders, you can optionally pass `mailboxCount` in the body.

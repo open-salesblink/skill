@@ -7,7 +7,8 @@
 | `/inbox`                   | GET    | Retrieve inbox threads                          |
 | `/inbox/:messageId/thread` | GET    | Get all messages in a specific thread           |
 | `/inbox/:messageId/reply`  | POST   | Reply to a lead's email                         |
-| `/inbox/:messageId`        | PATCH  | Mark as read/unread, set outcome classification |
+| `/inbox/:messageId/forward` | POST   | Forward an email to another recipient             |
+| `/inbox/:messageId`         | PATCH  | Mark as read/unread, set outcome classification   |
 
 ## Get Inbox
 
@@ -21,7 +22,7 @@ Query params:
 
 | Param      | Type    | Description                                               |
 | ---------- | ------- | --------------------------------------------------------- |
-| `type`     | string  | `all` (replies, default), `draft`, `scheduled`, or `sent` |
+| `type`     | string  | `draft`, `scheduled`, `sent`, or omit for replies (default) |
 | `limit`    | integer | Max 100 (default: 10)                                     |
 | `skip`     | integer | Offset (default: 0)                                       |
 | `sequence` | string  | Filter by sequence UUID                                   |
@@ -29,7 +30,8 @@ Query params:
 | `search`   | string  | Search in body, subject, or email address                 |
 | `date`     | string  | Date range as `startTimestamp-endTimestamp`               |
 | `sender`   | string  | Filter by sender ID                                       |
-| `owned_by` | string  | Filter by user email (owners/admins only)                 |
+
+> **Note:** Query filtering is limited on this endpoint. `owned_by` and several documented advanced filters are not implemented in the current API. Use the response client-side for precise filtering where needed.
 
 ```
 GET /inbox?type=all&limit=50&skip=0
@@ -48,6 +50,36 @@ Headers:
 - `Authorization`: `SALESBLINK_API_KEY`
 
 Returns all messages in a conversation thread, sorted newest first.
+
+## Forward Email
+
+**POST** `/inbox/:messageId/forward`
+
+Headers:
+
+- `Authorization`: `SALESBLINK_API_KEY`
+- `Content-Type`: `application/json`
+
+Body:
+
+```json
+{
+  "email": "colleague@company.com",
+  "content": "<p>Please see below.</p>"
+}
+```
+
+| Field     | Type    | Req | Description                                                         |
+| --------- | ------- | --- | ------------------------------------------------------------------- |
+| `email`   | string  |     | Recipient email address (defaults to the original contact if omitted) |
+| `content` | string  |     | Optional additional message content                                 |
+| `cc`      | string  |     | Optional CC email address                                           |
+| `bcc`     | string  |     | Optional BCC email address                                            |
+| `scheduled_time` | integer | | Schedule at this timestamp (ms). Defaults to ~20s delay |
+| `tzMode` | string | | Timezone mode: `"sequence"` or `"custom"` |
+| `selectedTimezone` | string | | Timezone identifier if tzMode is custom |
+
+> If `email` is omitted, the email is forwarded to the original contact. If `content` is omitted, the original email body is forwarded as-is.
 
 ## Reply to Email
 
@@ -101,3 +133,5 @@ Body:
 | --------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `unread`  | boolean | Mark as read (`false`) or unread (`true`)                                                                                                                                |
 | `outcome` | string  | Classify the reply: `"interested"`, `"not-interested"`, `"automatic-response"`, `"meeting-request"`, `"out-of-office"`, `"do-not-contact"`, `"wrong-person"`, `"closed"` |
+
+> **Note:** The underlying API applies any body fields directly to the task document. Only `unread` and `outcome` are documented/stable; use other fields with caution.

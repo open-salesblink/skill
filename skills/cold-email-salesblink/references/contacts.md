@@ -10,6 +10,40 @@
 | `/leads/:id` | PATCH | Update lead fields |
 | `/leads/:id/move` | PUT | Move a lead to a different list |
 | `/contacts/:id/archive` | PUT | Archive or unarchive a contact |
+| `/leads/activity` | GET | Get activity history for a lead by email query parameter |
+| `/leads/:id/activity` | GET | Get activity history for a lead by ID |
+| `/leads/:id/unsubscribe` | POST | Globally unsubscribe a lead from all sequences |
+
+## Get Lead Activity by ID
+
+**GET** `/leads/:id/activity`
+
+Headers:
+- `Authorization`: `SALESBLINK_API_KEY`
+
+Query params: `sequence_id`, `from`, `to` (Unix ms), `limit` (max 500), `skip`
+
+Response: `{ success, data: [...], lead, count, skip, limit }`
+
+## Get Lead Activity by Email
+
+**GET** `/leads/activity?email=lead@example.com`
+
+Headers:
+- `Authorization`: `SALESBLINK_API_KEY`
+
+Query params: `email` (required), `sequence_id`, `from`, `to` (Unix ms), `limit` (max 500), `skip`
+
+> Use this endpoint when you have the lead's email address but not the internal lead ID. Response shape is the same as `/leads/:id/activity`.
+
+## Globally Unsubscribe Lead
+
+**POST** `/leads/:id/unsubscribe`
+
+Headers:
+- `Authorization`: `SALESBLINK_API_KEY`
+
+Adds the lead to the global unsubscribe list and cancels pending tasks across all sequences.
 
 ## Get Leads
 

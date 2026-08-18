@@ -83,6 +83,8 @@ Body:
 |-------|------|-----|-------------|
 | `name` | string | ✅ | Workspace name (min 4 characters) |
 
+> **Note:** The API returns HTTP `201 Created`, not `200 OK`.
+
 ### Update Workspace
 
 **PATCH** `/workspaces/:id` (UUID)
@@ -99,3 +101,6 @@ Body:
 | Field | Type | Req | Description |
 |-------|------|-----|-------------|
 | `name` | string | ✅ | New workspace name (min 4 characters) |
+
+
+Note: For POST /workspaces, you can also optionally pass `workspaceName` in the body.

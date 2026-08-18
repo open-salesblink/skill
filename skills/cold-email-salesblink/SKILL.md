@@ -32,11 +32,16 @@ Use this skill when the user wants to:
 - Check campaign analytics (opens, clicks, replies, sent)
 - Set up outreach campaigns end-to-end
 - Manage workspaces, users, folders, or deliverability tests
-- Make any HTTP request to `run.salesblink.io/api/public/v1.0.0`
+- Make any HTTP request to `https://run.salesblink.io/api/public/v1.0.0`
 
 ## Gotchas
 
 - **ID types matter**: Templates and contact archive use MongoDB ObjectId (24-char hex). All other entities use UUID v4.
+- **GET `/lists/:id` returns an array**: The API returns a single-element array `[{ ... }]` even though the path looks like a single-resource endpoint. Extract the first item.
+- **Sequence status filters differ by endpoint**: `GET /sequences` uses status values `running`, `paused`, `completed`, `needs-attention`. `POST /sequences/:id/status` uses `ACTIVE`, `PAUSED`, `STOPPED`, `ARCHIVED`. Do not mix them up.
+- **GET `/sequences/:id` returns the internal flowchart**: The response includes the full internal `flowchart` object, not a simplified step list. Use `flowchart` to inspect steps.
+- **POST `/sequences/:id/clone` returns `clonedSequenceId`**: The response shape is `{ success, data: { clonedSequenceId }, message }`, not `data.id` or `data.name`.
+- **OAuth `redirectUrl` is ignored**: The API does not use a custom `redirectUrl` for `/oauth/google` or `/oauth/outlook`. The response field is `data.auth_url`, not `data.url`.
 - **messageId** is the RFC822 Message-ID (e.g. `<id@domain.com>`) or Microsoft Graph ID. **Crucial:** Always URL-encode this ID when using it as a path parameter (e.g. in `/inbox/:messageId/thread`). This is distinct from the internal UUID `id`.
 - **`senders` is a comma-separated string**, not an array. It can mix sender IDs and folder IDs — the server auto-detects each.
 - **Sequence `steps` fully replace on PATCH**. Send the complete desired array.
@@ -45,11 +50,15 @@ Use this skill when the user wants to:
 - **`launchTimingMode: "now"` starts in 5 minutes**, not instantly.
 - **Template attachments use FormData field `attachment`** (not `attachments`). Max 3 per template.
 - **Remove template attachments via `remove_attachments`** array of file **names**.
-- **Adding SMTP sender requires `from_email`**, not `email`.
+- **POST `/senders` adds an SMTP/IMAP sender**. For Gmail and Outlook, OAuth is preferred — use `/oauth/google` or `/oauth/outlook`, which return an `auth_url` the user must open in a browser; the sender is created automatically after OAuth completion. SMTP/IMAP can still be used if the user explicitly provides SMTP/IMAP credentials.
+- **Adding an SMTP/IMAP sender requires `from_email`**, not `email`.
 - **If an endpoint for a specific task is not mentioned then tell the user that the endpoint is not available**
 - **If user does not have a list, ask them for a CSV file, or list of lead emails with data.**
 - **If email sender is not connected, help them connect one using APIs.**
 - **When asked to create a sequence or campaign for cold email outreach, first ask them about their ICP, Offer, and other details.**
+- **Forward content is optional**: `POST /inbox/:messageId/forward` uses the original email body when `content` is omitted.
+- **`/blocklist` CLI vocabulary maps to `/unsubscribe` endpoints**: all blocklist operations use the `/unsubscribe` public API.
+- **Archiving is done via dedicated archive routes**: `PATCH /lists/:id`, `PATCH /templates/:id`, and `PATCH /sequences/:id` ignore the `archived` field. Use `PUT /lists/:id/archive`, `PUT /templates/:id/archive`, and `PUT /sequences/:id/archive` instead.
 
 ## Base URL
 
@@ -65,11 +74,12 @@ Pass it in every request as the `Authorization` header (no "Bearer" prefix):
 
 ## Rate Limits
 
-| Method        | Limit | Window     |
-| ------------- | ----- | ---------- |
-| GET           | 30    | per minute |
-| POST / PATCH  | 15    | per minute |
-| PUT (archive) | 10    | per minute |
+| Method        | Limit | Window     | Applies To |
+| ------------- | ----- | ---------- | ---------- |
+| GET           | 30    | per minute | Most GET endpoints |
+| POST / PATCH  | 15    | per minute | POST and PATCH endpoints |
+| PUT (archive) | 10    | per minute | PUT and DELETE endpoints |
+| POST /signup  | 5     | per day    | Public signup (per IP) |
 
 On `429 Too Many Requests`: wait at least 60 seconds before retrying. For batch operations, insert a 4-second delay between requests.
 
@@ -102,11 +112,15 @@ Create a new SalesBlink account. This is a public endpoint and does not require 
 
 **Constraints:**
 - `password`: Min 8 characters, max 48 characters, at least one uppercase and one lowercase letter.
-- **Rate Limit**: 2 signups per day.
+- **Rate Limit**: 5 signups per day per IP.
 
 ## Pagination
 
 Most list endpoints use `limit` (max 100) and `skip`. Activity endpoints (`/sent`, `/opens`, `/clicks`, `/replies`) use `per_page` (max 100) and `page` (1-indexed).
+
+Some endpoints support higher limits:
+- `/sequences/:id/leads` and `/leads/:id/activity` — max 500
+- `/sequences/:id/export` — max 50,000 (default 10,000)
 
 Always paginate. Never assume a single request returns all data.
 
@@ -130,7 +144,13 @@ Read the relevant reference file before performing operations in that domain:
   - Use these endpoints when the user wants to view or interact with email conversations. The inbox contains reply threads, sent emails, scheduled emails, and drafts. Each thread has a messageId. The user can reply to a lead's email, mark messages as read/unread, or classify outcomes.
 
 - **Activity tracking** → [references/activity.md](references/activity.md)
-  - Use these endpoints when the user wants to query engagement events. The system tracks four event types: sent (emails sent), opens (emails opened), clicks (links clicked), and replies (responses received). Events can be filtered by sequence, recipient email, and date range.
+  - Use these endpoints when the user wants to query engagement events. The system tracks four event types: sent (emails sent), opens (emails opened), clicks (links clicked), and replies (responses received). Events can be filtered by sequence, recipient email, and date range. Also includes per-lead activity history.
+
+- **Analytics** → [references/analytics.md](references/analytics.md)
+  - Use these endpoints when the user wants aggregated campaign analytics: overall stats across all sequences, day-wise breakdowns, lead-level stats, and per-mailbox/sender stats.
+
+- **Blocklist / unsubscribes** → [references/blocklist.md](references/blocklist.md)
+  - Use these endpoints when the user wants to manage account-level unsubscribes and blocked emails/domains. The public API uses `/unsubscribe` routes for all blocklist operations.
 
 - **Users & workspaces** → [references/organization.md](references/organization.md)
   - Use these endpoints when the user wants to manage team membership or workspaces. A workspace is an account boundary. Users have roles (client, user, admin, developer). Only owners and admins can invite users or create workspaces.

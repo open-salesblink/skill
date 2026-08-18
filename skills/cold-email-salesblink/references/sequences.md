@@ -4,13 +4,43 @@
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/sequences` | GET | List all sequences. Query: `limit`, `skip`, `owned_by` |
-| `/sequences/:id` | GET | Get sequence details including steps and settings |
-| `/sequences/:id/stats` | GET | Get performance analytics. Query: `from`, `to`, `sender` |
+| `/sequences` | GET | List all sequences. Query: `limit`, `skip`, `owned_by`, `status` (`running`, `paused`, `completed`, `needs-attention`) |
+| `/sequences/:id` | GET | Get sequence details including the internal `flowchart` object |
+| `/sequences/:id/stats` | GET | Get performance analytics. Query: `from`, `to`, `sender` (filter ignored by current API) |
+| `/sequences/:id/leads` | GET | List leads in a sequence |
+| `/sequences/:id/leads/:leadId/messages` | GET | Message history for a lead in a sequence |
+| `/sequences/:id/leads/:leadId/unsubscribe` | POST | Remove a lead from a sequence |
+| `/sequences/:id/export` | GET | Export sequence leads as CSV |
+| `/sequences/:id/status` | POST | Update sequence status (ACTIVE, PAUSED, STOPPED, ARCHIVED) |
 | `/sequences` | POST | Create a full sequence with steps, senders, lists |
 | `/sequences/:id` | PATCH | Update settings, pause/resume, rewrite steps |
 | `/sequences/:id/clone` | POST | Duplicate an existing sequence (created paused) |
 | `/sequences/:id/archive` | PUT | Archive or unarchive a sequence |
+
+## Get Sequences
+
+**GET** `/sequences`
+
+Headers:
+- `Authorization`: `SALESBLINK_API_KEY`
+
+Query params: `limit` (max 100), `skip`, `owned_by`, `status`
+
+| `status` value | Meaning |
+|----------------|---------|
+| `running` | Active sequences |
+| `paused` | Paused sequences |
+| `completed` | Sequences that have completed all sends |
+| `needs-attention` | Sequences with issues (e.g. bounces, errors) |
+
+## Get Sequence by ID
+
+**GET** `/sequences/:id` (UUID)
+
+Headers:
+- `Authorization`: `SALESBLINK_API_KEY`
+
+> **Note:** The response exposes the internal `flowchart` object. Step data must be read from `flowchart`, not from a simplified `steps` array.
 
 ## Create Sequence
 
@@ -32,13 +62,23 @@ Body:
     { "type": "email", "template_id": "507f1f77bcf86cd799439012" }
   ],
   "paused": false,
-  "launchTimingMode": "now",
-  "timezone": "America/New_York",
+  "launchTimingMode": "schedule",
+  "scheduledAt": 1751983200000,
+  "timezone": "Asia/Calcutta",
   "delayEnabled": true,
   "delayFrom": 10,
   "delayTo": 20,
   "stopWhenReplyRecieved": true,
-  "stopWhenReplyRecievedWhen": "contact"
+  "stopWhenReplyRecievedWhen": "contact",
+  "emailSendingHours": [
+    { "enabled": true, "name": "Monday", "fromTime": "09:00", "toTime": "17:00" },
+    { "enabled": true, "name": "Tuesday", "fromTime": "09:00", "toTime": "17:00" },
+    { "enabled": true, "name": "Wednesday", "fromTime": "09:00", "toTime": "17:00" },
+    { "enabled": true, "name": "Thursday", "fromTime": "09:00", "toTime": "17:00" },
+    { "enabled": true, "name": "Friday", "fromTime": "09:00", "toTime": "17:00" },
+    { "enabled": false, "name": "Saturday", "fromTime": "09:00", "toTime": "17:00" },
+    { "enabled": false, "name": "Sunday", "fromTime": "09:00", "toTime": "17:00" }
+  ]
 }
 ```
 
@@ -53,9 +93,9 @@ Required fields marked with ✅:
 | `folder` | string | | Folder ID (UUID) |
 | `starred` | boolean | | Star the sequence |
 | `paused` | boolean | | Create in paused state (default: **true**) |
-| `launchTimingMode` | string | | `"now"` (starts in 5 mins) or `"schedule"` (requires `scheduledAt`) |
-| `scheduledAt` | integer | | UTC timestamp in **milliseconds** (required if mode = `"schedule"`) |
-| `timezone` | string | | Timezone for sending (default: `"America/New_York"`) |
+| `launchTimingMode` | string | | `"now"` (starts in 5 mins) or `"schedule"` (requires `scheduledAt` and `timezone`) |
+| `scheduledAt` | integer \| string | | UTC timestamp in **milliseconds** (recommended). ISO 8601 strings with timezone offset are documented but are not parsed correctly by the current API. Convert the desired time to Unix milliseconds before sending. (required if `launchTimingMode = "schedule"`) |
+| `timezone` | string | | IANA timezone for sending, e.g. `"Asia/Calcutta"` or `"America/New_York"`. Required when scheduling to avoid defaulting to `"America/New_York"` |
 | `delayEnabled` | boolean | | Enable random delay between emails (default: true) |
 | `delayFrom` | integer | | Minimum delay in minutes (default: 10) |
 | `delayTo` | integer | | Maximum delay in minutes (default: 20) |
@@ -136,6 +176,15 @@ Headers:
 
 Creates a paused duplicate of an existing sequence.
 
+Response:
+```json
+{
+  "success": true,
+  "data": { "clonedSequenceId": "new-sequence-uuid" },
+  "message": "Sequence cloned successfully"
+}
+```
+
 ## Archive Sequence
 
 **PUT** `/sequences/:id/archive` (UUID)
@@ -150,3 +199,54 @@ Body:
 ```
 
 Archiving a sequence automatically pauses it and removes pending email tasks.
+
+## Sequence Lead Lifecycle
+
+**GET** `/sequences/:id/leads`
+
+Headers:
+- `Authorization`: `SALESBLINK_API_KEY`
+
+Query params: `limit` (max 500), `skip`
+
+Response: `{ success, data: [...], count, total, skip, limit }`
+
+**GET** `/sequences/:id/leads/:leadId/messages`
+
+Headers:
+- `Authorization`: `SALESBLINK_API_KEY`
+
+Query params: `from`, `to` (Unix ms), `limit` (max 500), `skip`
+
+Response: `{ success, data: [...], count, skip, limit }`
+
+**POST** `/sequences/:id/leads/:leadId/unsubscribe`
+
+Headers:
+- `Authorization`: `SALESBLINK_API_KEY`
+
+Removes the lead from the sequence (same behavior as the internal remove-from-sequence action). Returns `{ success: true }`.
+
+## Sequence Export & Status
+
+**GET** `/sequences/:id/export`
+
+Headers:
+- `Authorization`: `SALESBLINK_API_KEY`
+
+Query params: `limit` (max 50000, default 10000)
+
+Returns a CSV download of sequence leads.
+
+**POST** `/sequences/:id/status`
+
+Headers:
+- `Authorization`: `SALESBLINK_API_KEY`
+- `Content-Type`: `application/json`
+
+Body:
+```json
+{ "status": "PAUSED" }
+```
+
+Allowed statuses: `ACTIVE`, `PAUSED`, `STOPPED`, `ARCHIVED`.

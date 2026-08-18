@@ -8,10 +8,11 @@
 | `/opens` | GET | Email open events |
 | `/clicks` | GET | Link click events |
 | `/replies` | GET | Reply events |
+| `/leads/:id/activity` | GET | Activity history for a specific lead |
 
 ## Query Parameters
 
-All activity endpoints support:
+The `/sent`, `/opens`, `/clicks`, and `/replies` endpoints support:
 
 | Param | Type | Description |
 |-------|------|-------------|
@@ -23,7 +24,8 @@ All activity endpoints support:
 | `from` | integer | Start of date range (timestamp, ms) |
 | `to` | integer | End of date range (timestamp, ms) |
 
-> Use `per_page` and `page` for activity endpoints — not `limit`/`skip`.
+> Use `per_page` and `page` for these activity endpoints — not `limit`/`skip`.
+> `/leads/:id/activity` uses `limit`/`skip` instead (see Lead Activity section below).
 
 ## Response Format
 
@@ -53,3 +55,22 @@ Headers:
 
 Headers:
 - `Authorization`: `SALESBLINK_API_KEY`
+
+## Lead Activity
+
+**GET** `/leads/:id/activity`
+
+Headers:
+- `Authorization`: `SALESBLINK_API_KEY`
+
+Query params:
+
+| Param | Type | Description |
+|-------|------|-------------|
+| `sequence_id` | string | Filter by sequence UUID |
+| `from` | integer | Start of date range (timestamp, ms) |
+| `to` | integer | End of date range (timestamp, ms) |
+| `limit` | integer | Maximum number of results (max 500) |
+| `skip` | integer | Offset for pagination |
+
+Returns the activity history for a specific lead across sequences.

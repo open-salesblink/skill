@@ -5,11 +5,31 @@
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/lists` | GET | Retrieve all lists. Query: `limit` (max 100), `skip`, `owned_by` |
-| `/lists/:id` | GET | Get a specific list by UUID |
-| `/lists/:id/leads` | GET | Get leads in a list. Query: `limit` (max 100), `skip` |
+| `/lists/:id` | GET | Get a specific list by UUID — returns a single object `{ ... }` |
+| `/lists/:id/leads` | GET | Get leads in a list — `total` reflects current page size |
 | `/lists` | POST | Create a new list |
 | `/lists/:id` | PATCH | Update a list |
 | `/lists/:id/archive` | PUT | Archive or unarchive a list |
+
+## Get List by ID
+
+**GET** `/lists/:id` (UUID)
+
+Headers:
+- `Authorization`: `SALESBLINK_API_KEY`
+
+> **Note:** The API returns a single list object `{ ... }` for this endpoint.
+
+## Get Leads
+
+**GET** `/lists/:id/leads?limit=100&skip=0`
+
+Headers:
+- `Authorization`: `SALESBLINK_API_KEY`
+
+Query params: `limit` (max 100), `skip`
+
+> **Note:** `total` in the response reflects the number of leads in the current page, not the total count across all pages.
 
 ## Create List
 
@@ -22,11 +42,7 @@ Headers:
 Body:
 ```json
 {
-  "name": "Q1 Prospects",
-  "removeDuplicates": {
-    "inThisList": true,
-    "inOtherLists": true
-  }
+  "name": "Q1 Prospects"
 }
 ```
 
@@ -40,9 +56,6 @@ Required fields marked with ✅:
 | `verification` | boolean | | Enable email verification ⚠️ **IRREVERSIBLE** |
 | `archive_invalid` | boolean | | Auto-archive invalid emails ⚠️ **IRREVERSIBLE** |
 | `archive_risky` | boolean | | Auto-archive risky emails ⚠️ **IRREVERSIBLE** |
-| `removeDuplicates.inThisList` | boolean | | Remove duplicate emails within this list |
-| `removeDuplicates.inOtherLists` | boolean | | Remove contacts that exist in other lists |
-| `removeDuplicates.inTeamMembersLists` | boolean | | Remove contacts that exist in team members' lists |
 
 ## Update List
 

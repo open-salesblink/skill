@@ -4,10 +4,15 @@
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/senders` | GET | List all connected senders (grouped by folder) |
-| `/senders` | POST | Add a single SMTP/IMAP sender |
-| `/senders/bulk` | POST | Bulk add senders via CSV upload |
+| `/senders` | GET | List all connected senders (flat list, not grouped by folder) |
+| `/senders` | POST | Add a single SMTP/IMAP sender. `folder` is accepted in the body but is **not persisted**. OAuth is preferred for Gmail/Outlook (`/oauth/google`, `/oauth/outlook`). |
+| `/senders/bulk` | POST | Bulk add senders via CSV upload (multipart `csvFile` only) |
 | `/senders/:id` | PATCH | Update sender settings (warmup, inbox, signature, tracking, etc.) |
+| `/senders/:id/reconnect` | POST | Reconnect a failed sender |
+| `/senders/:id/health` | GET | Get sender health/reputation score |
+| `/senders/:id/warmup-stats` | GET | Date-wise warmup stats |
+| `/senders/:id/fetch-messages` | POST | Retrieve sent emails and received replies for a sender (max 50 messages, use `?skip` for pagination) |
+| `/senders/multi/fetch-messages` | POST | Bulk retrieve sent emails and received replies across senders (max 50 messages, use `?skip` for pagination) |
 | `/warmup-links` | GET | List warmup link configurations |
 | `/oauth/google` | POST | Get Google OAuth URL for connecting Gmail |
 | `/oauth/outlook` | POST | Get Microsoft OAuth URL for connecting Outlook |
@@ -19,11 +24,17 @@
 Headers:
 - `Authorization`: `SALESBLINK_API_KEY`
 
-Query params: `limit` (max 100), `skip`, `owned_by`
+Query params: `limit` (max 100), `skip`, `folder` (legacy folder UUID), `filter` (legacy filter string)
+
+> **Note:** The response is a flat array of senders. It is **not** grouped by folder. The `owned_by` query parameter is not supported; use the legacy `folder` and `filter` parameters if needed.
+
+> `folder` is **not persisted** when creating or updating a sender via `POST /senders` or `PATCH /senders/:id`.
 
 ## Add Single Sender (SMTP/IMAP)
 
 **POST** `/senders`
+
+> **Note:** This endpoint adds an SMTP/IMAP sender. For Gmail and Outlook, OAuth is preferred — use `/oauth/google` or `/oauth/outlook` to get an authorization URL and the sender is created automatically after OAuth completion. SMTP/IMAP can still be used if the user explicitly provides SMTP/IMAP credentials.
 
 Headers:
 - `Authorization`: `SALESBLINK_API_KEY`
@@ -72,6 +83,53 @@ Body:
 
 > If `imap_host` is omitted or empty, the sender is created as **SMTP-only** (`serviceName: "smtponly"`).
 
+## Sender Lifecycle & Diagnostics
+
+**POST** `/senders/:id/reconnect`
+
+Headers:
+- `Authorization`: `SALESBLINK_API_KEY`
+- `Content-Type`: `application/json`
+
+Re-queues a failed SMTP/IMAP sender for connection, or refreshes OAuth tokens for Gmail/Outlook senders.
+
+**GET** `/senders/:id/health`
+
+Headers:
+- `Authorization`: `SALESBLINK_API_KEY`
+
+Returns sender health/reputation score and diagnostic info.
+
+**GET** `/senders/:id/warmup-stats`
+
+Headers:
+- `Authorization`: `SALESBLINK_API_KEY`
+
+Query params: `days` (integer, max 90, default 30)
+
+Returns date-wise warmup statistics for the sender.
+
+**POST** `/senders/:id/fetch-messages`
+
+Headers:
+- `Authorization`: `SALESBLINK_API_KEY`
+- `Content-Type`: `application/json`
+
+Schedules an inbox fetch for the sender.
+
+**POST** `/senders/multi/fetch-messages`
+
+Headers:
+- `Authorization`: `SALESBLINK_API_KEY`
+- `Content-Type`: `application/json`
+
+Body:
+```json
+{ "ids": ["sender-id-1", "sender-id-2"] }
+```
+
+Bulk fetch messages across multiple senders.
+
 ## Bulk Add Senders
 
 **POST** `/senders/bulk`
@@ -80,7 +138,9 @@ Headers:
 - `Authorization`: `SALESBLINK_API_KEY`
 - `Content-Type`: `multipart/form-data`
 
-Upload a CSV file via FormData with field name `csvFile`.
+Upload a CSV file via FormData with field name `csvFile`. JSON arrays of senders are **not** accepted.
+
+> The CSV must contain the columns required for SMTP/IMAP sender creation (e.g. `from_email`, `from_name`, `password`, `smtp_host`, `smtp_port`, etc.).
 
 ## Update Sender
 
@@ -153,7 +213,7 @@ Response:
 Headers:
 - `Authorization`: `SALESBLINK_API_KEY`
 
-Query params: `limit` (max 100), `skip`
+Query params: `limit` and `skip` are accepted for compatibility but currently have no effect — all matching links are returned.
 
 List warmup link configurations. These URLs are used in sender warmup campaigns to improve deliverability.
 
@@ -163,6 +223,8 @@ List warmup link configurations. These URLs are used in sender warmup campaigns 
 
 Headers:
 - `Authorization`: `SALESBLINK_API_KEY`
+
+Body is optional. A custom `redirectUrl` in the body is ignored by the API.
 
 Returns an `auth_url` that the user must visit to authorize Gmail access.
 
@@ -181,4 +243,14 @@ Response:
 Headers:
 - `Authorization`: `SALESBLINK_API_KEY`
 
+Body is optional. A custom `redirectUrl` in the body is ignored by the API.
+
 Returns an `auth_url` for Microsoft Outlook authorization.
+
+Response:
+```json
+{
+  "success": true,
+  "data": { "auth_url": "https://login.microsoftonline.com/..." }
+}
+```

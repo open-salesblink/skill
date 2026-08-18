@@ -20,7 +20,7 @@ Query params:
 | `from` | integer | Start date timestamp (milliseconds) |
 | `to` | integer | End date timestamp (milliseconds) |
 | `limit` | integer | Max 100 (default enforced server-side) |
-| `skip` | integer | Offset |
+| `skip` | integer | Page number (0-based). The server converts this to skip × limit as the database offset. |
 
 > The endpoint maps `from`/`to` to a date range filter internally. Both are optional; omitting them returns all available report data.
 

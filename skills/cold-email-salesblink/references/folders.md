@@ -4,8 +4,8 @@
 
 | Endpoint   | Method | Description     |
 | ---------- | ------ | --------------- |
-| `/folders` | GET    | List folders    |
-| `/folders` | POST   | Create a folder |
+| `/folders` | GET | List folders — the public API currently returns only `email-sender` folders |
+| `/folders` | POST | Create a folder — returns `{ success: true }` only |
 
 ## Get Folders
 
@@ -14,6 +14,8 @@
 Headers:
 
 - `Authorization`: `SALESBLINK_API_KEY`
+
+> **Note:** The public API currently returns only `email-sender` folders regardless of any `type` query parameter. Other folder types (list, template, sequence) are not exposed through this v1 endpoint.
 
 ## Create Folder
 
@@ -29,13 +31,15 @@ Body:
 ```json
 {
   "name": "Q1 Campaigns",
-  "type": "sequence"
+  "type": "email-sender"
 }
 ```
 
 | Field  | Type   | Req | Description                                               |
 | ------ | ------ | --- | --------------------------------------------------------- |
 | `name` | string | ✅  | Folder name                                               |
-| `type` | string | ✅  | `"list"`, `"template"`, `"sequence"`, or `"email-sender"` |
+| `type` | string | ✅  | The API only accepts `"email-sender"` for this endpoint   |
 
-> If `type` contains `"sender"`, it is automatically converted to `"email-sender"`.
+> **Response:** The API returns `{ success: true }` only. It does not return the created folder object.
+
+> Any `type` value other than `"email-sender"` is ignored or converted by the API.

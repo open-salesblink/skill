@@ -93,7 +93,9 @@ Body:
     { "type": "email", "template_id": "TEMPLATE_2_ID" }
   ],
   "paused": false,
-  "launchTimingMode": "now"
+  "launchTimingMode": "schedule",
+  "scheduledAt": 1751983200000,
+  "timezone": "America/New_York"
 }
 ```
 
@@ -108,7 +110,7 @@ Goal: Duplicate an existing sequence and tweak it.
 Headers:
 - `Authorization`: `SALESBLINK_API_KEY`
 
-Extract `NEW_SEQ_ID` from response.
+Extract `NEW_SEQ_ID` from `response.data.clonedSequenceId`.
 
 ### 2. Update the cloned sequence with new settings
 
