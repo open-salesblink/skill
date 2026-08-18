@@ -20,6 +20,24 @@ Grab your key from [`run.salesblink.io/account/integration/api`](https://run.sal
 
 ### 2. Install the skill
 
+**Recommended: let your agent install it (copy-paste prompt)**
+
+Paste this into your AI agent and it will set everything up for you:
+
+```text
+Set up the SalesBlink Cold Email agent skill from https://github.com/open-salesblink/skill
+for me. Read the README and SKILL.md in that repo, then install the skill in this
+environment using the method that fits you best.
+
+Ask me for my SalesBlink API key (from
+https://run.salesblink.io/account/integration/api) and configure it as
+SALESBLINK_API_KEY. Verify the setup works, then help me launch my first cold
+email sequence: ask what product I'm selling and who I'm targeting, create the
+list, contacts, templates, and sequence, and walk me through launching it.
+```
+
+**Or install manually**
+
 **Any agent (npx)**
 
 ```bash
