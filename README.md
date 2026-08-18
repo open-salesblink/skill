@@ -84,22 +84,6 @@ git clone https://github.com/open-salesblink/skill.git
 
 Load the plugin from the cloned directory in Cursor's plugin settings.
 
-### Gemini CLI
-
-```bash
-gemini extensions install https://github.com/open-salesblink/skill
-```
-
-Or clone and link locally:
-
-```bash
-git clone https://github.com/open-salesblink/skill.git
-cd skill/.gemini-extension
-gemini extensions link .
-```
-
-Restart Gemini CLI after linking. The extension auto-loads `GEMINI.md` context.
-
 ### MCP
 
 Visit https://mcp.salesblink.io to connect via MCP.
@@ -164,7 +148,7 @@ Always paginate — never assume a single request returns all data.
 
 ## Quick Start: End-to-End Campaign
 
-See [`references/workflows.md`](references/workflows.md) for full examples. High-level flow:
+See [`skills/cold-email-salesblink/references/workflows.md`](skills/cold-email-salesblink/references/workflows.md) for full examples. High-level flow:
 
 1. **Create a list** → `POST /lists`
 2. **Add contacts** → `POST /contacts` (batch up to 500, PascalCase fields)
@@ -188,4 +172,4 @@ The [`evals/evals.json`](evals/evals.json) file contains test scenarios covering
 
 ## License
 
-This skill is provided as-is for use with the SalesBlink platform. Refer to SalesBlink's terms of service for API usage policies.
+MIT — © FUTUREBLINK Inc. See [LICENSE](LICENSE).

@@ -1,7 +1,7 @@
 {
   "name": "cold-email-salesblink",
   "owner": {
-    "name": "SalesBlink"
+    "name": "FUTUREBLINK Inc."
   },
   "metadata": {
     "description": "Run cold email sequences on autopilot and manage full sales outreach campaigns via the SalesBlink API. Use this skill to build automated multi-step email campaigns (sequences), manage leads and email lists, create reusable templates with merge variables and spintax, connect sending accounts (Gmail, Outlook, SMTP), handle inbox replies, and track campaign analytics (opens, clicks, replies, sent). Also supports bulk contact imports, email deliverability testing (inbox placement / spam checks), sender warmup links, workspace/team management, and any HTTP request to the SalesBlink platform."
@@ -11,8 +11,8 @@
       "name": "cold-email-salesblink",
       "source": "./",
       "description": "Run cold email sequences on autopilot and manage full sales outreach campaigns via the SalesBlink API. Use this skill to build automated multi-step email campaigns (sequences), manage leads and email lists, create reusable templates with merge variables and spintax, connect sending accounts (Gmail, Outlook, SMTP), handle inbox replies, and track campaign analytics (opens, clicks, replies, sent). Also supports bulk contact imports, email deliverability testing (inbox placement / spam checks), sender warmup links, workspace/team management, and any HTTP request to the SalesBlink platform.",
-      "version": "1.0.0",
-      "author": { "name": "SalesBlink" },
+      "version": "1.1.0",
+      "author": { "name": "FUTUREBLINK Inc." },
       "license": "MIT",
       "homepage": "https://github.com/open-salesblink/skill",
       "keywords": [

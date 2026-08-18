@@ -2,6 +2,12 @@
   "name": "cold-email-salesblink",
   "version": "1.0.0",
   "description": "SalesBlink cold email outreach MCP server (MCPB bundle)",
+  "author": "FUTUREBLINK Inc.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/open-salesblink/skill"
+  },
+  "homepage": "https://salesblink.io",
   "type": "module",
   "main": "server/index.js",
   "engines": {
