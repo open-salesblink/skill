@@ -25,13 +25,6 @@ npx skills add open-salesblink/skill
 /plugin install cold-email-salesblink
 ```
 
-**Hermes**
-
-```bash
-hermes skills tap add open-salesblink/skill
-hermes skills install cold-email-salesblink
-```
-
 **OpenClaw / ClawHub**
 
 ```bash
@@ -171,4 +164,3 @@ The [`evals/evals.json`](evals/evals.json) file contains test scenarios covering
 ## License
 
 This skill is provided as-is for use with the SalesBlink platform. Refer to SalesBlink's terms of service for API usage policies.
-
