@@ -1,15 +1,39 @@
 {
-  "name": "cold-email-salesblink",
+  "name": "@salesblink/cold-email-skill",
   "version": "1.0.0",
-  "description": "SalesBlink cold email outreach MCP server (MCPB bundle)",
-  "author": "FUTUREBLINK Inc.",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/open-salesblink/skill"
-  },
-  "homepage": "https://salesblink.io",
+  "description": "SalesBlink cold email outreach agent skill — install as an agent skill or MCP bundle (MCPB) for Claude, Claude Code, ChatGPT, OpenClaw, Claude Desktop, and other AI agents.",
   "type": "module",
   "main": "server/index.js",
+  "files": [
+    "server",
+    "manifest.json",
+    "README.md"
+  ],
+  "keywords": [
+    "salesblink",
+    "cold-email",
+    "agent-skill",
+    "skill",
+    "mcp",
+    "mcpb",
+    "model-context-protocol",
+    "claude",
+    "chatgpt",
+    "openclaw",
+    "outreach",
+    "sales"
+  ],
+  "author": "FUTUREBLINK Inc.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/open-salesblink/skill.git"
+  },
+  "bugs": "https://github.com/open-salesblink/skill/issues",
+  "homepage": "https://github.com/open-salesblink/skill#readme",
+  "publishConfig": {
+    "access": "public"
+  },
   "engines": {
     "node": ">=18.0.0"
   },
@@ -20,6 +44,5 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.18.0",
     "zod": "^3.25.0"
-  },
-  "license": "MIT"
+  }
 }
