@@ -1,6 +1,6 @@
 {
   "name": "@salesblink/cold-email-skill",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "SalesBlink cold email outreach agent skill — install as an agent skill or MCP bundle (MCPB) for Claude, Claude Code, ChatGPT, OpenClaw, Claude Desktop, and other AI agents.",
   "type": "module",
   "main": "server/index.js",

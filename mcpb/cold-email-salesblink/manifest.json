@@ -2,9 +2,9 @@
   "manifest_version": "0.3",
   "name": "cold-email-salesblink",
   "display_name": "SalesBlink Cold Email",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Run cold email sequences and sales outreach on autopilot via the SalesBlink API: lists, contacts, templates, sequences, senders, inbox, analytics, and deliverability tests.",
-  "long_description": "SalesBlink Cold Email gives your AI assistant full access to the SalesBlink public REST API.\n\n- **Campaigns**: build automated multi-step email sequences, launch, pause, resume, clone, and archive them\n- **Leads**: create lists, import contacts in bulk (up to 500 per request), move and update leads\n- **Templates**: reusable emails with merge variables like {{first_name}}, spintax, and attachments\n- **Senders**: connect Gmail/Outlook via OAuth or add SMTP/IMAP accounts, organize them in folders\n- **Inbox**: read reply threads, reply to prospects, forward, mark read/unread, classify outcomes\n- **Analytics**: track sent, opens, clicks, and replies with overall, daily, lead-level, and per-mailbox stats\n- **Deliverability**: run inbox placement tests across Gmail, Outlook, and other providers\n- **Workspace**: manage users, roles, workspaces, folders, domains, signatures, billing, and API keys\n\nThe server ships the complete SalesBlink API reference docs as built-in tools, so the assistant can look up exact endpoints and payload shapes before making requests. All requests are authenticated with your SalesBlink API key.",
+  "long_description": "SalesBlink Cold Email gives your AI assistant access to the SalesBlink public REST API.\n\n- **Campaigns**: build automated multi-step email sequences, launch, pause, resume, clone, and archive them\n- **Leads**: create lists, import contacts in bulk (up to 500 per request), move and update leads\n- **Templates**: reusable emails with merge variables like {{first_name}}, spintax, and attachments\n- **Senders**: connect Gmail/Outlook via OAuth; SMTP/IMAP and bulk CSV uploads are handled through the SalesBlink web UI\n- **Inbox**: read reply threads, reply to prospects, forward, mark read/unread, classify outcomes\n- **Analytics**: track sent, opens, clicks, and replies with overall, daily, lead-level, and per-mailbox stats\n- **Deliverability**: run inbox placement tests across Gmail, Outlook, and other providers\n- **Workspace**: manage users, roles, workspaces, folders, domains, signatures, billing, and API keys\n\nSensitive actions such as creating or refreshing API keys, placing Done-For-You orders, adding mailboxes, and bulk-uploading sender credentials return magic login links that redirect the user to the SalesBlink web UI. The server ships the complete SalesBlink API reference docs as built-in tools, so the assistant can look up exact endpoints and payload shapes before making requests.",
   "author": {
     "name": "FUTUREBLINK Inc.",
     "url": "https://salesblink.io"
@@ -43,29 +43,36 @@
       }
     }
   },
+  "icon": "icon.png",
   "tools": [
     {
-      "name": "salesblink_request",
-      "description": "Make any authenticated HTTP request to the SalesBlink public API (GET/POST/PATCH/PUT/DELETE with path, query, and JSON body)."
+      "name": "salesblink_get",
+      "description": "Make a read-only GET request to the SalesBlink public API."
+    },
+    {
+      "name": "salesblink_mutate",
+      "description": "Make a write request (POST/PATCH/PUT/DELETE) to the SalesBlink public API."
     },
     {
       "name": "salesblink_signup",
-      "description": "Create a new SalesBlink account (public endpoint) and receive an API key."
+      "description": "Get the public SalesBlink sign-up link where a new user can create an account."
     },
     {
       "name": "salesblink_list_reference_docs",
-      "description": "List the bundled SalesBlink API reference doc topics (lists, contacts, sequences, senders, inbox, analytics, ...)."
+      "description": "List the bundled SalesBlink API reference doc topics."
     },
     {
       "name": "salesblink_get_reference_doc",
-      "description": "Read a bundled SalesBlink API reference doc with exact endpoints, payload shapes, and gotchas for one domain."
+      "description": "Read a bundled SalesBlink API reference doc with exact endpoints and payload shapes."
     },
     {
       "name": "salesblink_check_auth",
       "description": "Verify the configured SalesBlink API key by calling GET /account/verify."
     }
   ],
+
   "compatibility": {
+    "claude_desktop": ">=1.0.0",
     "platforms": [
       "darwin",
       "win32",
@@ -79,9 +86,9 @@
     "api_key": {
       "type": "string",
       "title": "SalesBlink API Key",
-      "description": "Your SalesBlink API key (starts with key-). Get one at https://run.salesblink.io/account/integration/api — or leave blank and use the salesblink_signup tool to create an account.",
+      "description": "Your SalesBlink API key (starts with key-). Get one at https://run.salesblink.io/account/integration/api — or use the salesblink_signup tool to get the sign-up link.",
       "sensitive": true,
-      "required": true
+      "required": false
     },
     "log_level": {
       "type": "string",

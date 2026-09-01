@@ -1,0 +1,8 @@
+.mcpbignore
+.gitignore
+.git
+test/
+*.log
+.DS_Store
+Thumbs.db
+*.mcpb
