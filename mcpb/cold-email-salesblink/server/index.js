@@ -111,28 +111,25 @@ const server = new McpServer(
   {
     instructions: [
       "SalesBlink cold email outreach API gateway.",
-      "Workflow: call salesblink_get_reference_doc with topic 'overview' first, then fetch the topic for the domain you need (lists, contacts, templates, sequences, senders, inbox, ...), then call salesblink_request with the exact method/path/body from the docs.",
+      "Workflow: call salesblink_get_reference_doc with topic 'overview' first, then fetch the topic for the domain you need (lists, contacts, templates, sequences, senders, inbox, ...), then call salesblink_get for read endpoints or salesblink_mutate for write endpoints with the exact path/body from the docs.",
       `All requests go to ${BASE_URL}. Authentication uses the configured API key in the Authorization header (no Bearer prefix).`,
       "Always check the 'success' field in API responses. Paginate list endpoints with limit/skip (per_page/page for activity endpoints).",
     ].join(" "),
   },
 );
 
-// --- Tool 1: generic API gateway -------------------------------------------
+// --- Tool 1a: read-only GET gateway ----------------------------------------
 
 server.registerTool(
-  "salesblink_request",
+  "salesblink_get",
   {
-    title: "SalesBlink API Request",
+    title: "SalesBlink API GET",
     description:
-      "Make any authenticated HTTP request to the SalesBlink public API " +
+      "Make a read-only GET request to the SalesBlink public API " +
       `(${BASE_URL}). Use salesblink_get_reference_doc to look up exact endpoints, ` +
-      "payload shapes, and gotchas before calling this. " +
-      "Example: method=GET path=/lists, or method=POST path=/templates body={...}.",
+      "query parameters, and gotchas before calling this. " +
+      "Example: path=/lists, query={ limit: 100, skip: 0 }.",
     inputSchema: {
-      method: z
-        .enum(["GET", "POST", "PATCH", "PUT", "DELETE"])
-        .describe("HTTP method"),
       path: z
         .string()
         .min(1)
@@ -144,10 +141,67 @@ server.registerTool(
         .record(z.union([z.string(), z.number(), z.boolean()]))
         .optional()
         .describe("Query string parameters, e.g. { limit: 100, skip: 0 }"),
+    },
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: false,
+    },
+  },
+  async ({ path: apiPath, query }) => {
+    try {
+      const result = await salesblinkRequest({
+        method: "GET",
+        path: apiPath,
+        query,
+        apiKey: API_KEY,
+      });
+      return jsonResult({
+        status: result.status,
+        truncated: result.truncated || undefined,
+        data: result.body,
+      });
+    } catch (err) {
+      return errorResult(err);
+    }
+  },
+);
+
+// --- Tool 1b: write/mutate gateway -----------------------------------------
+
+server.registerTool(
+  "salesblink_mutate",
+  {
+    title: "SalesBlink API Mutate",
+    description:
+      "Make a write request to the SalesBlink public API " +
+      `(${BASE_URL}): POST, PATCH, PUT, or DELETE. Use salesblink_get_reference_doc ` +
+      "to look up exact endpoints, payload shapes, and gotchas before calling this. " +
+      "Example: method=POST path=/sequences body={...}.",
+    inputSchema: {
+      method: z
+        .enum(["POST", "PATCH", "PUT", "DELETE"])
+        .describe("HTTP method"),
+      path: z
+        .string()
+        .min(1)
+        .max(2048)
+        .describe(
+          "Relative API path starting with /, e.g. /sequences or /lists/abc-123. URL-encode messageIds in paths.",
+        ),
+      query: z
+        .record(z.union([z.string(), z.number(), z.boolean()]))
+        .optional()
+        .describe("Query string parameters"),
       body: z
         .unknown()
         .optional()
-        .describe("JSON request body for POST/PATCH/PUT (ignored for GET/DELETE)"),
+        .describe("JSON request body for POST/PATCH/PUT (ignored for DELETE)"),
+    },
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: true,
+      openWorldHint: true,
     },
   },
   async ({ method, path: apiPath, query, body }) => {
@@ -177,37 +231,25 @@ server.registerTool(
   {
     title: "SalesBlink Signup",
     description:
-      "Create a new SalesBlink account (public endpoint, no API key needed). " +
-      "Returns an API key on success. Password: 8-48 chars, at least one uppercase " +
-      "and one lowercase letter. Rate limited to 5 signups per day per IP.",
-    inputSchema: {
-      email: z.string().email().max(254).describe("Account email address"),
-      password: z
-        .string()
-        .min(8, "Password must be at least 8 characters")
-        .max(48, "Password must be at most 48 characters")
-        .regex(/[a-z]/, "Password needs at least one lowercase letter")
-        .regex(/[A-Z]/, "Password needs at least one uppercase letter")
-        .describe("8-48 chars, at least one uppercase and one lowercase letter"),
-      name: z.string().min(1).max(200).describe("Full name"),
+      "Returns the public SalesBlink sign-up link where a new user can create an account. " +
+      "No API key is required.",
+    inputSchema: {},
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: false,
     },
   },
-  async ({ email, password, name }) => {
-    try {
-      const result = await salesblinkRequest({
-        method: "POST",
-        path: "/signup",
-        body: { email, password, name },
-        requireAuth: false,
-      });
-      return jsonResult({
-        status: result.status,
-        data: result.body,
-        note: "Save the returned api_key and configure it as the api_key user config (SALESBLINK_API_KEY).",
-      });
-    } catch (err) {
-      return errorResult(err);
-    }
+  async () => {
+    return jsonResult({
+      success: true,
+      message: "Please sign up through the SalesBlink web UI.",
+      data: {
+        login_link: "https://run.salesblink.io/signup",
+        destination: "/signup",
+        purpose: "signup",
+      },
+    });
   },
 );
 
@@ -219,8 +261,13 @@ server.registerTool(
     title: "List API Reference Docs",
     description:
       "List the bundled SalesBlink API reference doc topics. Read 'overview' first, " +
-      "then the topic for the domain you are working in, before using salesblink_request.",
+      "then the topic for the domain you are working in, before using salesblink_get or salesblink_mutate.",
     inputSchema: {},
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: false,
+    },
   },
   async () => {
     try {
@@ -255,6 +302,11 @@ server.registerTool(
         .max(64)
         .describe("Doc topic, e.g. overview, sequences, lists, contacts, templates, senders"),
     },
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: false,
+    },
   },
   async ({ topic }) => {
     try {
@@ -283,6 +335,11 @@ server.registerTool(
       "Verify the configured SalesBlink API key by calling GET /account/verify. " +
       "Returns account info when the key is valid.",
     inputSchema: {},
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: false,
+    },
   },
   async () => {
     try {
@@ -303,7 +360,7 @@ server.registerTool(
 async function main() {
   if (!API_KEY) {
     logger.warn(
-      "SALESBLINK_API_KEY is not set — salesblink_request and salesblink_check_auth will fail until it is configured.",
+      "SALESBLINK_API_KEY is not set — salesblink_get, salesblink_mutate, and salesblink_check_auth will fail until it is configured.",
     );
   }
 

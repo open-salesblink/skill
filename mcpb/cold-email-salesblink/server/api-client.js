@@ -130,7 +130,7 @@ export async function salesblinkRequest({
   if (requireAuth && !apiKey) {
     throw new ApiError("No SalesBlink API key configured.", {
       status: 401,
-      hint: "Set the api_key user config (SALESBLINK_API_KEY env var). Get a key at https://run.salesblink.io/account/integration/api, or use the salesblink_signup tool to create an account.",
+      hint: "Set the api_key user config (SALESBLINK_API_KEY env var). Get a key at https://run.salesblink.io/account/integration/api, or use the salesblink_signup tool to get the sign-up link.",
     });
   }
 

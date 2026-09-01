@@ -66,13 +66,14 @@ async function main() {
   const names = tools.map((t) => t.name).sort();
   const expected = [
     "salesblink_check_auth",
+    "salesblink_get",
     "salesblink_get_reference_doc",
     "salesblink_list_reference_docs",
-    "salesblink_request",
+    "salesblink_mutate",
     "salesblink_signup",
   ];
   check(
-    "tools/list returns exactly the 5 expected tools",
+    "tools/list returns exactly the 6 expected tools",
     JSON.stringify(names) === JSON.stringify(expected),
     JSON.stringify(names),
   );
@@ -120,12 +121,12 @@ async function main() {
 
   // --- request without API key ---
   const noKeyRes = await client.callTool({
-    name: "salesblink_request",
-    arguments: { method: "GET", path: "/lists" },
+    name: "salesblink_get",
+    arguments: { path: "/lists" },
   });
   const noKeyJson = parseJson(noKeyRes);
   check(
-    "request without API key returns clear 401 isError",
+    "GET request without API key returns clear 401 isError",
     noKeyRes.isError === true &&
       noKeyJson?.error?.status === 401 &&
       /api key/i.test(noKeyJson?.error?.message || ""),
@@ -134,38 +135,41 @@ async function main() {
 
   // --- SSRF guard ---
   const ssrfRes = await client.callTool({
-    name: "salesblink_request",
-    arguments: { method: "GET", path: "https://evil.example.com/x" },
+    name: "salesblink_get",
+    arguments: { path: "https://evil.example.com/x" },
   });
-  check("request rejects absolute URL path (SSRF guard)", ssrfRes.isError === true);
+  check("GET request rejects absolute URL path (SSRF guard)", ssrfRes.isError === true);
 
   const protoRelRes = await client.callTool({
-    name: "salesblink_request",
-    arguments: { method: "GET", path: "//evil.example.com/x" },
+    name: "salesblink_get",
+    arguments: { path: "//evil.example.com/x" },
   });
-  check("request rejects protocol-relative path", protoRelRes.isError === true);
+  check("GET request rejects protocol-relative path", protoRelRes.isError === true);
 
   // --- invalid method rejected by schema validation ---
   // (the SDK reports input-validation failures as isError tool results)
   const badMethodRes = await client.callTool({
-    name: "salesblink_request",
+    name: "salesblink_mutate",
     arguments: { method: "TRACE", path: "/lists" },
   });
   check(
-    "request rejects invalid HTTP method (schema validation)",
+    "mutate request rejects invalid HTTP method (schema validation)",
     badMethodRes.isError === true && /validation/i.test(textOf(badMethodRes)),
     textOf(badMethodRes).slice(0, 200),
   );
 
-  // --- signup schema validation ---
-  const weakPwRes = await client.callTool({
+  // --- signup returns a login link ---
+  const signupRes = await client.callTool({
     name: "salesblink_signup",
-    arguments: { email: "a@b.co", password: "weak", name: "T" },
+    arguments: {},
   });
+  const signupJson = parseJson(signupRes);
   check(
-    "signup rejects weak password (schema validation)",
-    weakPwRes.isError === true && /validation|password/i.test(textOf(weakPwRes)),
-    textOf(weakPwRes).slice(0, 200),
+    "signup returns a public sign-up link",
+    !signupRes.isError &&
+      typeof signupJson?.data?.login_link === "string" &&
+      signupJson.data.login_link.startsWith("https://"),
+    textOf(signupRes).slice(0, 200),
   );
 
   // --- check_auth without key ---
