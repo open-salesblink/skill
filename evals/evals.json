@@ -4,10 +4,10 @@
     {
       "id": 1,
       "prompt": "Create a new list called 'Q2 Prospects' with email verification enabled and add 3 contacts: john@example.com, jane@example.com, bob@example.com. Then tell me the list ID.",
-      "expected_output": "A list is created with verification=true, 3 contacts are added with PascalCase field names, and the list UUID is returned.",
+      "expected_output": "A list is created with verification=true, 3 contacts are added with snake_case field names, and the list UUID is returned.",
       "assertions": [
         "The POST /lists payload includes name: 'Q2 Prospects' and verification: true",
-        "The POST /contacts payload uses PascalCase field names (Email, First_Name)",
+        "The POST /contacts payload uses snake_case field names (email, first_name)",
         "The contact array has exactly 3 entries",
         "The agent explicitly warns the user that enabling verification is irreversible"
       ]
@@ -31,7 +31,7 @@
         "No single request exceeds 500 contacts",
         "remove_duplicates is set to true in each batch",
         "The agent mentions rate limit awareness (15 POST/min)",
-        "Contact fields use PascalCase naming convention"
+        "Contact fields use snake_case naming convention"
       ]
     },
     {
