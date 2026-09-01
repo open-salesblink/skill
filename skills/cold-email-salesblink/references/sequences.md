@@ -4,7 +4,7 @@
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/sequences` | GET | List all sequences. Query: `limit`, `skip`, `owned_by`, `status` (`running`, `paused`, `completed`, `needs-attention`) |
+| `/sequences` | GET | List all sequences. Query: `limit`, `skip`, `owned_by`, `status` (`running`, `paused`, `completed`, `needs-attention`), `folder`, `sendAll`, `sortBy`, `sortType`, `search` |
 | `/sequences/:id` | GET | Get sequence details including the internal `flowchart` object |
 | `/sequences/:id/stats` | GET | Get performance analytics. Query: `from`, `to`, `sender` (filter ignored by current API) |
 | `/sequences/:id/leads` | GET | List leads in a sequence |
@@ -24,7 +24,7 @@
 Headers:
 - `Authorization`: `SALESBLINK_API_KEY`
 
-Query params: `limit` (max 100), `skip`, `owned_by`, `status`
+Query params: `limit` (max 100), `skip`, `owned_by`, `status`, `folder`, `sendAll`, `sortBy`, `sortType`, `search`
 
 | `status` value | Meaning |
 |----------------|---------|
@@ -87,10 +87,10 @@ Required fields marked with ✅:
 | Field | Type | Req | Description |
 |-------|------|-----|-------------|
 | `name` | string | ✅ | Sequence name |
-| `senders` | string | ✅ | **Comma-separated string** of sender/folder IDs (NOT an array) |
+| `senders` | string | ✅ | **Comma-separated string** of sender/folder IDs (NOT an array). Folder IDs here must be email-sender folders. |
 | `lists` | string[] | ✅ | Array of list UUIDs |
 | `steps` | Step[] | ✅ | Ordered array of email and delay steps |
-| `folder` | string | | Folder ID (UUID) |
+| `folder` | string | | General folder ID (UUID). Must be a folder created without a `type` (i.e., not an email-sender folder). |
 | `starred` | boolean | | Star the sequence |
 | `paused` | boolean | | Create in paused state (default: **true**) |
 | `launchTimingMode` | string | | `"now"` (starts in 5 mins) or `"schedule"` (requires `scheduledAt` and `timezone`) |
@@ -158,14 +158,17 @@ Headers:
 
 Body:
 ```json
-{ "paused": true }
+{
+  "folder": "folder_uuid",
+  "paused": true
+}
 ```
 
 Accepts the same fields as create (all optional). Additionally used to **pause/resume**.
 
 > **Critical**: When updating `steps`, the entire array is **replaced** — send the full desired step list.
 
-> Updates to `name`, `starred`, or `folder` do **not** trigger task rescheduling. All other field updates do.
+> Updates to `name`, `starred`, or `folder` do **not** trigger task rescheduling. `folder` must be a folder created without a `type` (i.e., not an email-sender folder). All other field updates do.
 
 ## Clone Sequence
 

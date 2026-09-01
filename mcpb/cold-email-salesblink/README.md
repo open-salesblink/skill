@@ -13,7 +13,7 @@ The bundle runs a local Node.js MCP server (stdio transport) that acts as a hard
 - **Campaigns** — build multi-step email sequences, launch, pause, resume, clone, archive
 - **Leads** — create lists, bulk-import contacts (500/request), move and update leads
 - **Templates** — merge variables (`{{first_name}}`), spintax, attachments
-- **Senders** — Gmail/Outlook OAuth, SMTP/IMAP accounts, warmup links
+- **Senders** — Gmail/Outlook OAuth; SMTP/IMAP and bulk CSV through the SalesBlink web UI
 - **Inbox** — reply threads, replies, forwards, outcome classification
 - **Analytics** — sent/opens/clicks/replies, overall/daily/lead-level/mailbox stats
 - **Deliverability** — inbox placement tests across providers
@@ -25,22 +25,32 @@ The complete SalesBlink API reference (endpoints, payload shapes, gotchas) ships
 
 | Tool | Purpose |
 | ---- | ------- |
-| `salesblink_request` | Make any authenticated API call: `method`, `path`, `query`, `body` |
-| `salesblink_signup` | Create a SalesBlink account (public) and receive an API key |
+| `salesblink_get` | Make a read-only GET request: `path`, `query` |
+| `salesblink_mutate` | Make a write request: `method` (POST/PATCH/PUT/DELETE), `path`, `query`, `body` |
+| `salesblink_signup` | Get the public SalesBlink sign-up link where a new user can create an account |
 | `salesblink_list_reference_docs` | List bundled API doc topics |
 | `salesblink_get_reference_doc` | Read exact endpoints/payloads/gotchas for one domain |
 | `salesblink_check_auth` | Verify the configured API key (`GET /account/verify`) |
 
-Typical flow: `salesblink_get_reference_doc("overview")` → `salesblink_get_reference_doc("sequences")` → `salesblink_request({ method: "POST", path: "/sequences", body: {...} })`.
+Typical flow: `salesblink_get_reference_doc("overview")` → `salesblink_get_reference_doc("sequences")` → `salesblink_mutate({ method: "POST", path: "/sequences", body: {...} })`.
 
 ## Configuration
 
 Set during installation (defined in `manifest.json` `user_config`):
 
-- **SalesBlink API Key** (`SALESBLINK_API_KEY`, sensitive, required) — get one at <https://run.salesblink.io/account/integration/api>. Without it, only `salesblink_signup` and the doc tools work.
+- **SalesBlink API Key** (`SALESBLINK_API_KEY`, sensitive, optional) — get one at <https://run.salesblink.io/account/integration/api>, or use `salesblink_signup` to get the sign-up link. Without a key, only `salesblink_signup` and the doc tools work.
 - **Log Level** (`SALESBLINK_MCPB_LOG_LEVEL`, optional, default `info`) — `debug` | `info` | `warn` | `error`. Logs go to **stderr only**; stdout is reserved for the MCP protocol.
 
 Additional optional env var: `SALESBLINK_TIMEOUT_MS` (request timeout, default `30000`, max `120000`).
+
+## Privacy Policy
+
+This extension connects to the SalesBlink public API at `https://run.salesblink.io/api/public/v1.0.0` and the SalesBlink marketing site. The only user data it transmits is:
+
+- The SalesBlink API key you provide during installation (sent in the `Authorization` header).
+- The API paths, query parameters, and JSON bodies you choose to send through the tools.
+
+No other local files, browser data, or third-party services are accessed. Logs are written to **stderr only** and the API key is redacted from them. SalesBlink's privacy policy is available at <https://salesblink.io/privacy-policy>.
 
 ## Security
 
@@ -51,7 +61,7 @@ Additional optional env var: `SALESBLINK_TIMEOUT_MS` (request timeout, default `
 
 ## Rate limits (SalesBlink API)
 
-- GET: 30/min · POST/PATCH: 15/min · PUT/DELETE: 10/min · signup: 5/day per IP
+- GET: 30/min · POST/PATCH: 15/min · PUT/DELETE: 10/min · GET /signup-link: 250/day per IP
 - On `429`, wait at least 60 seconds before retrying; the server returns this hint in the error payload.
 
 ## Build from source

@@ -28,12 +28,7 @@ Get a key at: https://run.salesblink.io/account/integration/api
 - **`launchTimingMode: "now"` starts in 5 minutes**, not instantly.
 - **Template attachments use FormData field `attachment`** (not `attachments`). Max 3 per template.
 - **Remove template attachments via `remove_attachments`** array of file **names**.
-- **POST `/senders` adds an SMTP/IMAP sender**. For Gmail and Outlook, OAuth is preferred — use `/oauth/google` or `/oauth/outlook`, which return an `auth_url` the user must open in a browser; the sender is created automatically after OAuth completion. SMTP/IMAP can still be used if the user explicitly provides SMTP/IMAP credentials.
-- **Adding an SMTP/IMAP sender requires `from_email`**, not `email`.
-- **If an endpoint for a specific task is not mentioned then tell the user that the endpoint is not available**
-- **If user does not have a list, ask them for a CSV file, or list of lead emails with data.**
-- **If email sender is not connected, help them connect one using APIs.**
-- **When asked to create a sequence or campaign for cold email outreach, first ask them about their ICP, Offer, and other details.**
+- **GET `/senders/connect-link` returns a login link; it does not create senders through this API gateway**. For Gmail and Outlook, use `/oauth/google` or `/oauth/outlook`, which return an `auth_url` the user must open in a browser; the sender is created automatically after OAuth completion. SMTP/IMAP and bulk CSV sender creation must be done in the SalesBlink web UI.
 - **Forward content is optional**: `POST /inbox/:messageId/forward` uses the original email body when `content` is omitted.
 - **`/blocklist` CLI vocabulary maps to `/unsubscribe` endpoints**: all blocklist operations use the `/unsubscribe` public API.
 - **Archiving is done via dedicated archive routes**: `PATCH /lists/:id`, `PATCH /templates/:id`, and `PATCH /sequences/:id` ignore the `archived` field. Use `PUT /lists/:id/archive`, `PUT /templates/:id/archive`, and `PUT /sequences/:id/archive` instead.
@@ -45,19 +40,25 @@ Get a key at: https://run.salesblink.io/account/integration/api
 | GET           | 30    | per minute | Most GET endpoints |
 | POST / PATCH  | 15    | per minute | POST and PATCH endpoints |
 | PUT (archive) | 10    | per minute | PUT and DELETE endpoints |
-| POST /signup  | 5     | per day    | Public signup (per IP) |
+| GET /signup-link | 250   | per day    | Public signup link (per IP) |
 
 On `429 Too Many Requests`: wait at least 60 seconds before retrying. For batch operations, insert a 4-second delay between requests.
 
 ## Public Signup
 
-**POST** `/signup` — public endpoint, no API key required. Successful signup returns an API key.
+**GET** `/signup-link` — public endpoint, no API key required. It returns a sign-up link to the SalesBlink web UI:
 
 ```json
-{ "email": "user@example.com", "password": "SecurePassword123", "name": "John Doe" }
+{
+  "success": true,
+  "message": "Please sign up through the SalesBlink web UI.",
+  "data": {
+    "login_link": "https://run.salesblink.io/signup",
+    "destination": "/signup",
+    "purpose": "signup"
+  }
+}
 ```
-
-Constraints: `password` min 8, max 48 chars, at least one uppercase and one lowercase letter. Rate limit: 5 signups per day per IP.
 
 ## Pagination
 
@@ -77,7 +78,7 @@ Use `salesblink_get_reference_doc` with one of these topics before performing op
 - `contacts` — add/update/move/remove leads in lists (batch up to 500)
 - `templates` — reusable email templates with merge variables and attachments
 - `sequences` — automated email campaigns (steps, launch, pause, clone, archive)
-- `senders` — sending accounts (OAuth Gmail/Outlook, SMTP/IMAP), warmup links
+- `senders` — sending accounts: Gmail/Outlook OAuth via `/oauth/google` and `/oauth/outlook`; SMTP/IMAP and bulk CSV via the SalesBlink web UI
 - `inbox` — reply threads, sent/scheduled emails, drafts, classify outcomes
 - `activity` — engagement events: sent, opens, clicks, replies
 - `analytics` — aggregated campaign stats (overall, day-wise, lead-level, per-mailbox)
@@ -87,7 +88,7 @@ Use `salesblink_get_reference_doc` with one of these topics before performing op
 - `account-config` — custom tracking domains, signatures
 - `dfy` — Done-For-You domain purchase and mailbox provisioning
 - `billing` — saved payment methods, billing magic links
-- `api-keys` — list, create, refresh, delete API keys
+- `api-keys` — list and delete API keys; create/refresh via the SalesBlink web UI login link
 - `reports` — aggregated activity reports over a date range
 - `inbox-placement` — deliverability / spam placement tests
 - `workflows` — end-to-end campaign setup examples

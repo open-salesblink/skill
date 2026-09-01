@@ -5,8 +5,8 @@
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/keys` | GET | List all API keys for the account |
-| `/keys` | POST | Create a new API key |
-| `/keys/:id/refresh` | POST | Refresh an existing API key (deletes old, creates new) |
+| `/keys/create-link` | GET | Get a magic login link to the API keys page in the SalesBlink web UI |
+| `/keys/:id/refresh-link` | GET | Get a magic login link to refresh an API key in the SalesBlink web UI |
 | `/keys/:id` | DELETE | Delete an API key |
 
 ## Get API Keys
@@ -18,34 +18,47 @@ Headers:
 
 Returns a list of all API keys associated with the account.
 
-## Create API Key
+## Get API Key Creation Link
 
-**POST** `/keys`
+**GET** `/keys/create-link`
 
 Headers:
 - `Authorization`: `SALESBLINK_API_KEY`
-- `Content-Type`: `application/json`
 
-Body:
+> **Important**: Creating an API key through this API gateway is no longer supported. **GET** `/keys/create-link` returns a magic login link to the API keys page in the SalesBlink web UI:
+
 ```json
-{ "name": "Zapier Integration" }
+{
+  "success": true,
+  "message": "Please manage API keys through the SalesBlink web UI.",
+  "data": {
+    "login_link": "https://run.salesblink.io/magic?token=...&redirect=%2Faccount%2Fintegration%2Fapi",
+    "destination": "/account/integration/api",
+    "purpose": "manage_api_keys"
+  }
+}
 ```
 
-| Field | Type | Req | Description |
-|-------|------|-----|-------------|
-| `name` | string | ✅ | A descriptive name for the API key |
+## Get API Key Refresh Link
 
-## Refresh API Key
-
-**POST** `/keys/:id/refresh`
+**GET** `/keys/:id/refresh-link`
 
 Headers:
 - `Authorization`: `SALESBLINK_API_KEY`
 
-This endpoint generates a new API key and deletes the old one identified by `:id`. 
+> **Important**: Refreshing an API key through this API gateway is no longer supported. **GET** `/keys/:id/refresh-link` returns a magic login link to the API keys page in the SalesBlink web UI:
 
-> [!WARNING]
-> If you refresh the key you are currently using, you must update your integration immediately as the old key will be revoked.
+```json
+{
+  "success": true,
+  "message": "Please refresh API keys through the SalesBlink web UI.",
+  "data": {
+    "login_link": "https://run.salesblink.io/magic?token=...&redirect=%2Faccount%2Fintegration%2Fapi",
+    "destination": "/account/integration/api",
+    "purpose": "manage_api_keys"
+  }
+}
+```
 
 ## Delete API Key
 

@@ -4,7 +4,7 @@
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/lists` | GET | Retrieve all lists. Query: `limit` (max 100), `skip`, `owned_by` |
+| `/lists` | GET | Retrieve all lists. Query: `limit` (max 100), `skip`, `owned_by`, `folder` |
 | `/lists/:id` | GET | Get a specific list by UUID — returns a single object `{ ... }` |
 | `/lists/:id/leads` | GET | Get leads in a list — `total` reflects current page size |
 | `/lists` | POST | Create a new list |
@@ -19,6 +19,8 @@ Headers:
 - `Authorization`: `SALESBLINK_API_KEY`
 
 > **Note:** The API returns a single list object `{ ... }` for this endpoint.
+
+> **List responses include `fields`**: an array of the list's columns (from its Complete View) in snake_case, e.g. `["first_name", "last_name", "email", "lead_score"]`. This applies to `GET /lists`, `GET /lists/:id`, and `POST /lists` responses.
 
 ## Get Leads
 
@@ -51,7 +53,7 @@ Required fields marked with ✅:
 | Field | Type | Req | Description |
 |-------|------|-----|-------------|
 | `name` | string | ✅ | List name |
-| `folder` | string | | Folder ID (UUID) |
+| `folder` | string | | General folder ID (UUID). Must be a folder created without a `type` (i.e., not an email-sender folder). |
 | `starred` | boolean | | Star the list (default: false) |
 | `verification` | boolean | | Enable email verification ⚠️ **IRREVERSIBLE** |
 | `archive_invalid` | boolean | | Auto-archive invalid emails ⚠️ **IRREVERSIBLE** |
@@ -69,6 +71,7 @@ Body:
 ```json
 {
   "name": "Q2 Prospects Restructured",
+  "folder": "folder_uuid",
   "starred": true,
   "archive_invalid": true
 }
@@ -77,6 +80,7 @@ Body:
 | Field | Type | Description |
 |-------|------|-------------|
 | `name` | string | New name |
+| `folder` | string | Move list to a general folder (a folder created without a `type`, not an email-sender folder) |
 | `starred` | boolean | Star or unstar |
 | `duplicate_removal` | boolean | Remove duplicates from this list |
 | `duplicate_removal_other_list` | boolean | Remove contacts in other lists |

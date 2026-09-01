@@ -68,13 +68,13 @@ Body:
   "list_id": "a1b2c3d4-e5f6-7890-abcd-abcdef123456",
   "contacts": [
     {
-      "Email": "john@example.com",
-      "First_Name": "John",
-      "Last_Name": "Doe",
-      "Phone": "+1234567890",
-      "Company": "Acme Inc",
-      "Title": "VP Sales",
-      "Custom_Field": "any value"
+      "email": "john@example.com",
+      "first_name": "John",
+      "last_name": "Doe",
+      "phone": "+1234567890",
+      "company_name": "Acme Inc",
+      "job_title": "VP Sales",
+      "custom_field": "any value"
     }
   ],
   "remove_duplicates": true
@@ -91,15 +91,16 @@ Each contact object:
 
 | Field | Type | Req | Description |
 |-------|------|-----|-------------|
-| `Email` | string | ✅ | Lead's email address |
-| `First_Name` | string | | First name |
-| `Last_Name` | string | | Last name |
-| `Phone` | string | | Phone number |
-| `Company` | string | | Company name |
-| `Title` | string | | Job title |
+| `email` | string | ✅ | Lead's email address |
+| `first_name` | string | | First name |
+| `last_name` | string | | Last name |
+| `phone` | string | | Phone number |
+| `company_name` | string | | Company name |
+| `job_title` | string | | Job title |
+| `starred` | boolean | | Mark/unmark the contact as starred. This is a contact setting, not a data field/column. |
 | _(any key)_ | string | | Custom fields are supported |
 
-> **Field naming**: Use **PascalCase with underscores** (`First_Name`, `Last_Name`, `Email`).
+> **Field naming**: All field names **must be snake_case** (`first_name`, `last_name`, `email`, `company_name`, `lead_score`). Requests with non-snake_case field names are rejected with a 400 error. New custom fields are automatically added to the list's columns. The `starred` boolean is a contact setting and is NOT added as a list column. Use `PUT /contacts/:id/archive` to archive/unarchive contacts.
 
 ## Remove Contact
 
@@ -133,15 +134,18 @@ Headers:
 Body:
 ```json
 {
-  "First_Name": "Updated",
-  "Last_Name": "Name",
-  "Title": "CTO"
+  "first_name": "Updated",
+  "last_name": "Name",
+  "job_title": "CTO",
+  "starred": true
 }
 ```
 
-Any standard or custom contact fields can be updated. System fields (`_id`, `id`, `list_id`, `account_id`, `user_id`, `accuracy`, `provider`, `custom_fields`, `removed_sequences`, `verification_required`, `archive_invalid_contacts`, `archive_risky_contacts`, `processing`, `completed`, `completedAt`, `last_modified`, `created_date`, `verification_blocked`, `didOpen`, `didClick`, `didReply`, `contactStats`, `retryCount`, `esg_name`, `archived`, `deleted`) **cannot** be modified.
+Any standard or custom contact fields can be updated. All field names **must be snake_case**; requests with non-snake_case field names are rejected with a 400 error. System fields (`_id`, `id`, `list_id`, `account_id`, `user_id`, `accuracy`, `provider`, `custom_fields`, `removed_sequences`, `verification_required`, `archive_invalid_contacts`, `archive_risky_contacts`, `processing`, `completed`, `completedAt`, `last_modified`, `created_date`, `verification_blocked`, `didOpen`, `didClick`, `didReply`, `contactStats`, `retryCount`, `esg_name`, `archived`, `deleted`) **cannot** be modified.
 
-If updating `Email`, it is automatically lowercased.
+Use the dedicated `starred` boolean property to mark/unmark the lead as starred; `starred` is a contact setting and is NOT added as a list column. Use `PUT /contacts/:id/archive` to archive/unarchive contacts.
+
+If updating `email`, it is automatically lowercased.
 
 ## Move Lead
 

@@ -5,9 +5,9 @@
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/senders` | GET | List all connected senders (flat list, not grouped by folder) |
-| `/senders` | POST | Add a single SMTP/IMAP sender. `folder` is accepted in the body but is **not persisted**. OAuth is preferred for Gmail/Outlook (`/oauth/google`, `/oauth/outlook`). |
-| `/senders/bulk` | POST | Bulk add senders via CSV upload (multipart `csvFile` only) |
-| `/senders/:id` | PATCH | Update sender settings (warmup, inbox, signature, tracking, etc.) |
+| `/senders/connect-link` | GET | Get a magic login link to the email-sender connection page in the SalesBlink web UI. |
+| `/senders/bulk-connect-link` | GET | Get a magic login link to the bulk CSV sender upload page in the SalesBlink web UI. |
+| `/senders/:id` | PATCH | Update sender settings (warmup, inbox, signature, tracking, folder, etc.) |
 | `/senders/:id/reconnect` | POST | Reconnect a failed sender |
 | `/senders/:id/health` | GET | Get sender health/reputation score |
 | `/senders/:id/warmup-stats` | GET | Date-wise warmup stats |
@@ -24,64 +24,37 @@
 Headers:
 - `Authorization`: `SALESBLINK_API_KEY`
 
-Query params: `limit` (max 100), `skip`, `folder` (legacy folder UUID), `filter` (legacy filter string)
+Query params: `limit` (max 100), `skip`, `folder` (email-sender folder UUID), `filter` (legacy filter string)
 
-> **Note:** The response is a flat array of senders. It is **not** grouped by folder. The `owned_by` query parameter is not supported; use the legacy `folder` and `filter` parameters if needed.
+> **Note:** The response is a flat array of senders. It is **not** grouped by folder. The `owned_by` query parameter is not supported; use the `folder` (email-sender folder UUID) and `filter` query parameters if needed.
 
-> `folder` is **not persisted** when creating or updating a sender via `POST /senders` or `PATCH /senders/:id`.
+> Use `PATCH /senders/:id` with `folder` to move a sender into an email-sender folder, or pass an empty string to remove it from its folder. The `folder` field is **not** accepted when creating a sender.
 
-## Add Single Sender (SMTP/IMAP)
+## Get Single Sender Connection Link
 
-**POST** `/senders`
+**GET** `/senders/connect-link`
 
-> **Note:** This endpoint adds an SMTP/IMAP sender. For Gmail and Outlook, OAuth is preferred — use `/oauth/google` or `/oauth/outlook` to get an authorization URL and the sender is created automatically after OAuth completion. SMTP/IMAP can still be used if the user explicitly provides SMTP/IMAP credentials.
+> **Important**: Adding new SMTP/IMAP senders through this API gateway is no longer supported. To connect a sender, use one of these options:
+> - **Gmail / Google Workspace**: use **POST** `/oauth/google` to get an authorization URL. The sender is created automatically after OAuth completion.
+> - **Microsoft 365 / Outlook**: use **POST** `/oauth/outlook` to get an authorization URL. The sender is created automatically after OAuth completion.
+> - **SMTP/IMAP or bulk CSV**: request this endpoint to get a magic login link to the SalesBlink web UI at <https://run.salesblink.io/outreach/email-senders?addsenders=true>.
 
-Headers:
-- `Authorization`: `SALESBLINK_API_KEY`
-- `Content-Type`: `application/json`
+Response (`LoginLinkResponse`):
 
-Body:
 ```json
 {
-  "from_email": "outreach@yourcompany.com",
-  "from_name": "Sales Team",
-  "password": "your_password",
-  "smtp_host": "smtp.yourprovider.com",
-  "smtp_port": 587,
-  "user_name": "outreach@yourcompany.com",
-  "imap_host": "imap.yourprovider.com",
-  "imap_port": 993
+  "success": true,
+  "message": "Login link generated successfully",
+  "data": {
+    "login_link": "https://run.salesblink.io/magic?token=eyJ...&redirect=%2Foutreach%2Femail-senders%3Faddsenders%3Dtrue",
+    "destination": "/outreach/email-senders?addsenders=true",
+    "purpose": "connect_sender"
+  }
 }
 ```
 
-| Field | Type | Req | Description |
-|-------|------|-----|-------------|
-| `from_email` | string | ✅ | Sender email address |
-| `password` | string | ✅ | SMTP/IMAP password |
-| `smtp_host` | string | ✅ | SMTP server hostname |
-| `smtp_port` | integer/string | ✅ | SMTP port (e.g. 587) |
-| `from_name` | string | | Display name |
-| `user_name` | string | | SMTP username (defaults to `from_email`) |
-| `imap_host` | string | | IMAP hostname (omit for SMTP-only) |
-| `imap_port` | integer/string | | IMAP port (e.g. 993) |
-| `imap_user_name` | string | | IMAP username if different from SMTP |
-| `imap_password` | string | | IMAP password if different from SMTP |
-| `total_warmup_per_day` | integer | | Warmup emails per day (default: 5) |
-| `warmup_enabled` | boolean | | Enable warmup (default: false) |
-| `inbox_enable` | boolean | | Enable inbox (default: false) |
-| `warmup_tag` | string | | Warmup keyword/tag |
-| `inbox_path` | string | | Inbox folder path (default: "INBOX") |
-| `spam_path` | string | | Spam folder path |
-| `signature_id` | string | | Signature ID or name to attach |
-| `custom_tracking_url` | string | | Custom tracking domain (must be verified) |
-| `sequence_auto_ramp_up_enabled` | boolean | | Enable sequence ramp-up |
-| `sequence_initial_daily_frequency` | integer | | Initial daily send limit (default: 30) |
-| `sequence_ramp_up_frequency` | integer | | Ramp-up increment (default: 3) |
-| `max_emails_per_day` | integer | | Max daily send limit (default: 30) |
-| `dkim_identifier` | string | | DKIM identifier |
-| `reply_to_email` | string | | Reply-to email address |
 
-> If `imap_host` is omitted or empty, the sender is created as **SMTP-only** (`serviceName: "smtponly"`).
+For existing senders, use **PATCH** `/senders/:id` to update settings such as warmup, inbox, signature, tracking, or folder.
 
 ## Sender Lifecycle & Diagnostics
 
@@ -130,17 +103,25 @@ Body:
 
 Bulk fetch messages across multiple senders.
 
-## Bulk Add Senders
+## Get Bulk Sender Upload Link
 
-**POST** `/senders/bulk`
+**GET** `/senders/bulk-connect-link`
 
-Headers:
-- `Authorization`: `SALESBLINK_API_KEY`
-- `Content-Type`: `multipart/form-data`
+> **Important**: Bulk sender upload is not supported through this API gateway. To upload senders in bulk via CSV, request this endpoint to get a magic login link to the SalesBlink web UI at <https://run.salesblink.io/outreach/email-senders?addsenders=true>.
 
-Upload a CSV file via FormData with field name `csvFile`. JSON arrays of senders are **not** accepted.
+Calling **GET** `/senders/bulk-connect-link` returns a magic login link to the email-sender connection page:
 
-> The CSV must contain the columns required for SMTP/IMAP sender creation (e.g. `from_email`, `from_name`, `password`, `smtp_host`, `smtp_port`, etc.).
+```json
+{
+  "success": true,
+  "message": "Please upload senders in bulk through the SalesBlink web UI.",
+  "data": {
+    "login_link": "https://run.salesblink.io/magic?token=...&redirect=%2Foutreach%2Femail-senders%3Faddsenders%3Dtrue",
+    "destination": "/outreach/email-senders?addsenders=true",
+    "purpose": "bulk_upload_senders"
+  }
+}
+```
 
 ## Update Sender
 
@@ -196,6 +177,7 @@ Pass any of the fields below to update specific sender settings. Only provided f
 | `dkim_identifier` | string | DKIM identifier |
 | `use_custom_tracking_domain` | boolean | Use custom tracking domain |
 | `tracking_domain` | string | Tracking domain ID |
+| `folder` | string | Email-sender folder ID to move the sender into. Must be a folder created with `type: "email-sender"`. Pass an empty string to remove from folder. |
 
 Response:
 ```json

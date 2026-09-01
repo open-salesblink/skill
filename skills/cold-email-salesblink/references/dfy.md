@@ -1,18 +1,50 @@
 # Done-For-You (DFY) — Domains & Mailboxes
 
-Use these endpoints to purchase domains and provision Google Workspace / Microsoft 365 mailboxes with full deliverability setup.
+Use these endpoints to search domains and view existing Done-For-You orders.
 
-> **Prerequisites**: A saved payment method is required. Trial plans cannot place DFY orders.
+> **Important**: Placing new DFY orders and adding mailboxes to an existing order must be done through the SalesBlink web UI. The API supports searching domains, listing orders, and canceling a mailbox (which returns a billing management link).
 
 ## Endpoints
 
 | Endpoint                                    | Method | Description                                        |
 | ------------------------------------------- | ------ | -------------------------------------------------- |
 | `/domains/search`                           | GET    | Search available .com domains for DFY purchase     |
-| `/dfy/orders`                               | POST   | Place a new DFY domain + mailbox order             |
 | `/dfy/orders`                               | GET    | List all DFY orders                                |
-| `/dfy/orders/:orderId/mailboxes`            | POST   | Add mailboxes to an existing order                 |
-| `/dfy/orders/:orderId/mailboxes/:mailboxId` | DELETE | Cancel a mailbox (returns billing management link) |
+| `/dfy/order-link`                           | GET    | Get a magic login link to place a DFY order        |
+| `/dfy/orders/:orderId/mailbox-link`         | GET    | Get a magic login link to add mailboxes to an order |
+| `/dfy/orders/:orderId/mailboxes/:mailboxId/cancel-link` | GET | Get a magic login link to cancel a mailbox (billing management) |
+
+## Placing Orders and Adding Mailboxes
+
+`GET /dfy/order-link` and `GET /dfy/orders/:orderId/mailbox-link` return magic login links to the relevant page in the SalesBlink web UI:
+
+**GET** `/dfy/order-link` response:
+
+```json
+{
+  "success": true,
+  "message": "Please place Done-For-You orders through the SalesBlink web UI.",
+  "data": {
+    "login_link": "https://run.salesblink.io/magic?token=...&redirect=%2Foutreach%2Femail-senders%3Faddsenders%3Dtrue",
+    "destination": "/outreach/email-senders?addsenders=true",
+    "purpose": "place_dfy_order"
+  }
+}
+```
+
+**GET** `/dfy/orders/:orderId/mailbox-link` response:
+
+```json
+{
+  "success": true,
+  "message": "Please manage mailbox subscriptions through the SalesBlink web UI.",
+  "data": {
+    "login_link": "https://run.salesblink.io/magic?token=...&redirect=%2Faccount%2Fbilling%3Ftab%3Dsubscriptions",
+    "destination": "/account/billing?tab=subscriptions",
+    "purpose": "manage_subscriptions"
+  }
+}
+```
 
 ## Search Domains
 
@@ -43,153 +75,6 @@ Response:
 }
 ```
 
-## Place DFY Order
-
-**POST** `/dfy/orders`
-
-Headers:
-
-- `Authorization`: `SALESBLINK_API_KEY`
-- `Content-Type`: `application/json`
-
-### Provider-specific payloads
-
-#### Google Workspace (buy domain)
-
-```json
-{
-  "domains": [
-    {
-      "domain": "mybrand.com",
-      "isConnect": false,
-      "mailboxes": [
-        { "username": "john", "firstName": "John", "lastName": "Doe" },
-        { "username": "jane", "firstName": "Jane", "lastName": "Smith" }
-      ]
-    }
-  ],
-  "type": "google",
-  "password": "SecurePass123!",
-  "redirectionUrl": "https://mybrand.com"
-}
-```
-
-#### Google Workspace (connect existing domain)
-
-```json
-{
-  "domains": [
-    {
-      "domain": "mybrand.com",
-      "isConnect": true
-    }
-  ],
-  "type": "google",
-  "password": "SecurePass123!"
-}
-```
-
-#### Microsoft 365 / Outlook (buy domain)
-
-```json
-{
-  "domains": [
-    {
-      "domain": "mybrand.com",
-      "isConnect": false,
-      "mailboxes": [
-        { "username": "sales", "firstName": "Sales", "lastName": "Team" }
-      ]
-    }
-  ],
-  "type": "outlook"
-}
-```
-
-#### Azure (30 to 100 mailboxes per buy domain)
-
-```json
-{
-  "domains": [
-    {
-      "domain": "mybrand.com",
-      "mailboxes": [
-        { "username": "user001", "firstName": "User", "lastName": "001" },
-        { "username": "user002", "firstName": "User", "lastName": "002" }
-        // ... 30 to 100 mailboxes total per buy domain
-      ]
-    }
-  ],
-  "type": "azure"
-}
-```
-
-### Fields
-
-| Field              | Type   | Req | Description                                                                                                                            |
-| ------------------ | ------ | --- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `domains`          | array  | ✅  | Array of domain objects (see below). Buy and Connect domains cannot be mixed.                                                          |
-| `type`             | string | ✅  | Mailbox provider: `google`, `outlook`, or `azure`                                                                                      |
-| `password`         | string |     | **Required for Google.** Common password for ALL mailboxes. Auto-generated if omitted for google buy domains with no custom mailboxes. |
-| `redirectionUrl`   | string |     | Redirect URL for the domain                                                                                                            |
-| `masterInboxEmail` | string |     | Master inbox email for admin access                                                                                                    |
-| `couponCode`       | string |     | Optional Stripe coupon code                                                                                                            |
-
-### Domain object
-
-| Field       | Type    | Req | Description                                                                                                |
-| ----------- | ------- | --- | ---------------------------------------------------------------------------------------------------------- |
-| `domain`    | string  | ✅  | Domain name to purchase or connect                                                                         |
-| `isConnect` | boolean |     | `false` = buy new domain (default), `true` = connect your own existing domain                              |
-| `mailboxes` | array   |     | Array of mailbox objects. Required for buy domains: ≥1 for google/outlook, 30–100 for azure. Optional for connect-domain orders (admin mailbox auto-provisioned). |
-
-### Mailbox object
-
-| Field       | Type   | Req | Description                                  |
-| ----------- | ------ | --- | -------------------------------------------- |
-| `username`  | string | ✅  | Mailbox username (with or without `@domain`) |
-| `firstName` | string |     | First name                                   |
-| `lastName`  | string |     | Last name                                    |
-
-### Rules
-
-- You cannot mix buy and connect domains in the same order.
-- For **Google**, `password` is required for buy domains. Each buy domain must have at least 1 mailbox in the `mailboxes` array.
-- For **Outlook**, each buy domain must have at least 1 mailbox in the `mailboxes` array.
-- For **Azure**, each buy domain must have **30 to 100** mailboxes in the `mailboxes` array.
-- For **connect domains** (`isConnect: true`), no `mailboxes` array is needed in the request; the system will provision admin mailboxes automatically.
-- Connect domain orders return `nameservers` in the response. You must update your domain's nameservers before provisioning can begin.
-
-### Response
-
-Buy domain success:
-
-```json
-{
-  "success": true,
-  "message": "DFY order placed successfully",
-  "data": {
-    "id": "...",
-    "type": "google",
-    "status": "paid",
-    "amount": 23.00,
-    "domains": [...],
-    "nameservers": null
-  }
-}
-```
-
-Connect domain success:
-
-```json
-{
-  "success": true,
-  "message": "DFY order placed successfully",
-  "data": { ... },
-  "notice": "This is a connect domain order. Please update your domain's nameservers..."
-}
-```
-
 ## List DFY Orders
 
 **GET** `/dfy/orders`
@@ -217,49 +102,15 @@ Response:
 }
 ```
 
-## Add Mailboxes to Order
+## Get Mailbox Cancel Link
 
-**POST** `/dfy/orders/:orderId/mailboxes`
-
-Headers:
-
-- `Authorization`: `SALESBLINK_API_KEY`
-- `Content-Type`: `application/json`
-
-Body:
-
-```json
-{
-  "domainName": "mybrand.com",
-  "emails": [
-    { "username": "alice", "firstName": "Alice", "lastName": "Smith" },
-    { "username": "bob", "firstName": "Bob", "lastName": "Jones" }
-  ],
-  "password": "SecurePass123!"
-}
-```
-
-| Field        | Type   | Req | Description                              |
-| ------------ | ------ | --- | ---------------------------------------- |
-| `domainName` | string | ✅  | Domain in the order to add mailboxes to  |
-| `emails`     | array  | ✅  | Array of mailbox objects, each with non-empty `username` (without `@domain`), `firstName`, and `lastName` |
-| `password`   | string |     | Password for new mailboxes (Google only) |
-
-Rules:
-
-- Cannot add mailboxes to Azure orders.
-- Cannot add mailboxes to a domain where all mailboxes have been cancelled.
-- Duplicate usernames are rejected.
-
-## Cancel Mailbox
-
-**DELETE** `/dfy/orders/:orderId/mailboxes/:mailboxId`
+**GET** `/dfy/orders/:orderId/mailboxes/:mailboxId/cancel-link`
 
 Headers:
 
 - `Authorization`: `SALESBLINK_API_KEY`
 
-Cancels a mailbox. Returns a billing management login link because subscription changes must be managed from the web UI.
+Returns a billing management login link because subscription changes must be managed from the web UI.
 
 Response:
 
@@ -275,5 +126,4 @@ Response:
 }
 ```
 
-
-Note: For POST /dfy/orders, you can optionally pass `mailboxCount` in the body.
+To place a new DFY order or add mailboxes to an order, open the SalesBlink app and go to the email-sender connection flow.

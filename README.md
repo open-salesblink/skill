@@ -14,9 +14,9 @@ Run cold email sequences and sales outreach on autopilot via the [SalesBlink](ht
 
 ## Install in 30 seconds
 
-### 1. Get your API key
+### 1. Get your API key (or sign up)
 
-Grab your key from [`run.salesblink.io/account/integration/api`](https://run.salesblink.io/account/integration/api).
+Grab your key from [`run.salesblink.io/account/integration/api`](https://run.salesblink.io/account/integration/api), or use the `salesblink_signup` tool to get the public sign-up link.
 
 ### 2. Install the skill
 
@@ -30,8 +30,9 @@ for me. Read the README and SKILL.md in that repo, then install the skill in thi
 environment using the method that fits you best.
 
 Ask me for my SalesBlink API key (from
-https://run.salesblink.io/account/integration/api) and configure it as
-SALESBLINK_API_KEY. Verify the setup works, then help me launch my first cold
+https://run.salesblink.io/account/integration/api), or use the salesblink_signup
+tool to get the sign-up link if I don't have an account yet. Configure the API key
+as SALESBLINK_API_KEY. Verify the setup works, then help me launch my first cold
 email sequence: ask what product I'm selling and who I'm targeting, create the
 list, contacts, templates, and sequence, and walk me through launching it.
 ```
@@ -83,7 +84,7 @@ export SALESBLINK_API_KEY="key-****"
 
 - **Cold email campaigns** — build sequences, write templates, and launch outreach
 - **Lead management** — create lists, import contacts in bulk, move and update leads
-- **Sender management** — connect Gmail/Outlook via OAuth or SMTP/IMAP accounts
+- **Sender management** — connect Gmail/Outlook via OAuth; SMTP/IMAP and bulk CSV through the SalesBlink web UI
 - **Inbox & replies** — read threads, reply to prospects, mark conversations
 - **Analytics** — track opens, clicks, replies, and sent events
 - **Deliverability testing** — run inbox placement tests across providers
@@ -180,7 +181,7 @@ Always paginate — never assume a single request returns all data.
 See [`skills/cold-email-salesblink/references/workflows.md`](skills/cold-email-salesblink/references/workflows.md) for full examples. High-level flow:
 
 1. **Create a list** → `POST /lists`
-2. **Add contacts** → `POST /contacts` (batch up to 500, PascalCase fields)
+2. **Add contacts** → `POST /contacts` (batch up to 500, snake_case fields)
 3. **Create templates** → `POST /templates` (merge vars like `{{first_name}}`)
 4. **Fetch senders** → `GET /senders`
 5. **Create sequence** → `POST /sequences` (steps: email → delay → email …)

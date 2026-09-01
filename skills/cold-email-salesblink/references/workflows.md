@@ -38,8 +38,8 @@ Body:
 {
   "list_id": "LIST_ID_HERE",
   "contacts": [
-    { "Email": "alice@corp.com", "First_Name": "Alice", "Company": "Corp Inc" },
-    { "Email": "bob@startup.io", "First_Name": "Bob", "Company": "Startup IO" }
+    { "email": "alice@corp.com", "first_name": "Alice", "company_name": "Corp Inc" },
+    { "email": "bob@startup.io", "first_name": "Bob", "company_name": "Startup IO" }
   ],
   "remove_duplicates": true
 }

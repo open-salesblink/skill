@@ -2,7 +2,7 @@
 
 ## Add Card Login Link
 
-**POST** `/billing/add-card`
+**GET** `/billing/add-card-link`
 
 Headers:
 - `Authorization`: `SALESBLINK_API_KEY`
@@ -24,7 +24,7 @@ Response:
 
 ## Remove Card Login Link
 
-**POST** `/billing/remove-card`
+**GET** `/billing/remove-card-link`
 
 Headers:
 - `Authorization`: `SALESBLINK_API_KEY`
