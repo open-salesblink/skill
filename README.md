@@ -110,6 +110,14 @@ git clone https://github.com/open-salesblink/skill.git
 
 Load the plugin from the cloned directory in Cursor's plugin settings.
 
+### Gemini CLI
+
+```bash
+gemini extensions install https://github.com/open-salesblink/skill
+```
+
+Gemini CLI prompts for your `SALESBLINK_API_KEY` and stores it in the system keychain.
+
 ### ChatGPT
 
 ChatGPT connects via MCP — visit https://mcp.salesblink.io and add SalesBlink as an MCP connector, or use the `.mcpb` bundle below in an MCPB-compatible host.

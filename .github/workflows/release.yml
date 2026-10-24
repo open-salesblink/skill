@@ -1,0 +1,132 @@
+name: Release
+
+# Push a v* tag after bumping the version in the plugin manifests,
+# gemini-extension.json, server.json and mcpb/cold-email-salesblink.
+# Run manually with an existing tag to (re)publish that release to the registries;
+# manual runs use the metadata on the branch they are started from.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing release tag to publish (e.g. v1.2.0)"
+        required: true
+
+permissions:
+  contents: read
+
+env:
+  TAG: ${{ inputs.tag || github.ref_name }}
+  NODE_OPTIONS: --dns-result-order=ipv4first
+
+jobs:
+  mcpb:
+    name: Build and release .mcpb
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      sha256: ${{ steps.hash.outputs.sha256 }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check versions match the tag
+        run: |
+          want="${TAG#v}"
+          for f in mcpb/cold-email-salesblink/manifest.json server.json gemini-extension.json .claude-plugin/plugin.json .codex-plugin/plugin.json .cursor-plugin/plugin.json; do
+            got=$(jq -r .version "$f")
+            [ "$got" = "$want" ] || { echo "::error file=$f::version $got does not match tag $TAG"; exit 1; }
+          done
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build bundle (only when the release has no bundle yet)
+        id: build
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release download "$TAG" -R "$GITHUB_REPOSITORY" -p cold-email-salesblink.mcpb 2>/dev/null; then
+            echo "Release $TAG already has a bundle; reusing it."
+            echo "created=false" >> "$GITHUB_OUTPUT"
+          else
+            cd mcpb/cold-email-salesblink
+            npm ci --omit=dev
+            npm test
+            npx -y @anthropic-ai/mcpb pack . ../../cold-email-salesblink.mcpb
+            echo "created=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create GitHub release
+        if: steps.build.outputs.created == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$TAG" -R "$GITHUB_REPOSITORY" --generate-notes \
+            --title "SalesBlink MCP Bundle $TAG" cold-email-salesblink.mcpb
+
+      - id: hash
+        run: echo "sha256=$(sha256sum cold-email-salesblink.mcpb | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
+
+  mcp-registry:
+    name: Publish to MCP Registry
+    needs: mcpb
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Point server.json at this release
+        env:
+          SHA256: ${{ needs.mcpb.outputs.sha256 }}
+        run: |
+          jq --arg v "${TAG#v}" --arg tag "$TAG" --arg sha "$SHA256" '
+            .version = $v
+            | .packages[0].version = $v
+            | .packages[0].identifier = "https://github.com/\(env.GITHUB_REPOSITORY)/releases/download/\($tag)/cold-email-salesblink.mcpb"
+            | .packages[0].fileSha256 = $sha
+          ' server.json > server.tmp.json && mv server.tmp.json server.json
+          cat server.json
+
+      - name: Install mcp-publisher
+        run: |
+          curl -fsSL "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz" | tar xz mcp-publisher
+
+      - run: ./mcp-publisher login github-oidc
+      - run: ./mcp-publisher publish
+
+  clawhub:
+    name: Publish to ClawHub
+    needs: mcpb
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Publish skill (skipped if this version is already on ClawHub)
+        env:
+          CLAWHUB_TOKEN: ${{ secrets.CLAWHUB_TOKEN }}
+        run: |
+          [ -n "$CLAWHUB_TOKEN" ] || { echo "::error::CLAWHUB_TOKEN secret is not set"; exit 1; }
+          npm i -g clawhub@latest
+          clawhub --no-input login --token "$CLAWHUB_TOKEN" --label "github-actions ${GITHUB_REPOSITORY}"
+          version="${TAG#v}"
+          if clawhub inspect cold-email-salesblink --version "$version" > /dev/null 2>&1; then
+            echo "cold-email-salesblink@$version is already on ClawHub."
+            exit 0
+          fi
+          clawhub skill publish skills/cold-email-salesblink \
+            --version "$version" \
+            --name "Cold Email Campaigns with SalesBlink" \
+            --changelog "See https://github.com/${GITHUB_REPOSITORY}/releases/tag/${TAG}" \
+            --source-repo "$GITHUB_REPOSITORY" \
+            --source-commit "$(git rev-parse HEAD)" \
+            --source-ref "$TAG" \
+            --source-path skills/cold-email-salesblink

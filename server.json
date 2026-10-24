@@ -1,0 +1,29 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.open-salesblink/cold-email-salesblink",
+  "title": "SalesBlink Cold Email",
+  "description": "Cold email sequences, leads, templates, senders, inbox, and analytics via the SalesBlink API.",
+  "websiteUrl": "https://salesblink.io",
+  "repository": {
+    "url": "https://github.com/open-salesblink/skill",
+    "source": "github"
+  },
+  "version": "1.2.0",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://mcp.salesblink.io/mcp"
+    }
+  ],
+  "packages": [
+    {
+      "registryType": "mcpb",
+      "identifier": "https://github.com/open-salesblink/skill/releases/download/v1.2.0/cold-email-salesblink.mcpb",
+      "version": "1.2.0",
+      "fileSha256": "93c46136bc8469786e827fabc599aa023ae4f62a8e2d23cfe758a60c04ff44ca",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}
