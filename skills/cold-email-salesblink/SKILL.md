@@ -3,7 +3,8 @@ name: cold-email-salesblink
 description: >
   Run cold email sequences on autopilot and manage full sales outreach campaigns via the SalesBlink API.
   Use this skill to build automated multi-step email campaigns (sequences), manage leads and email lists,
-  create reusable templates with merge variables and spintax, connect Gmail/Outlook sending accounts via OAuth,
+  create reusable templates with merge variables and spintax, connect Gmail/Outlook sending accounts via OAuth
+  and SMTP/IMAP senders directly or by CSV,
   handle inbox replies, and track campaign analytics (opens, clicks, replies, sent).
   Also supports bulk contact imports, email deliverability testing (inbox placement / spam checks),
   sender warmup links, workspace/team management, and any HTTP request to the SalesBlink platform.
@@ -45,12 +46,13 @@ Use this skill when the user wants to:
 - **messageId** is the RFC822 Message-ID (e.g. `<id@domain.com>`) or Microsoft Graph ID. **Crucial:** Always URL-encode this ID when using it as a path parameter (e.g. in `/inbox/:messageId/thread`). This is distinct from the internal UUID `id`.
 - **`senders` is a comma-separated string**, not an array. It can mix sender IDs and folder IDs — the server auto-detects each.
 - **Sequence `steps` fully replace on PATCH**. Send the complete desired array.
+- **Email steps accept `send_as: "new" | "followup"`**: `"followup"` replies in the lead's existing thread (`Re: <original subject>`); it is ignored on the first email step, which always starts a new thread. The stored value reads back as `flowchart.nodes[].data.send_as`.
 - **Verification flags are IRREVERSIBLE**: `verification`, `archive_invalid`, `archive_risky` on lists can only be turned ON, never OFF.
 - **Sequences default to paused**: If `paused` is omitted on create, it defaults to `true`.
 - **`launchTimingMode: "now"` starts in 5 minutes**, not instantly.
 - **Template attachments use FormData field `attachment`** (not `attachments`). Max 3 per template.
 - **Remove template attachments via `remove_attachments`** array of file **names**.
-- **GET `/senders/connect-link` returns a login link; it does not create senders through this API gateway**. For Gmail and Outlook, use `/oauth/google` or `/oauth/outlook`, which return an `auth_url` the user must open in a browser; the sender is created automatically after OAuth completion. SMTP/IMAP and bulk CSV sender creation must be done in the SalesBlink web UI.
+- **GET `/senders/connect-link` returns a login link; it does not create a sender**. For Gmail and Outlook, use `/oauth/google` or `/oauth/outlook`, which return an `auth_url` the user must open in a browser; the sender is created automatically after OAuth completion. SMTP/IMAP senders can be added with `POST /senders/add-sender` (JSON) or `POST /senders/add-bulk-senders` (CSV, `multipart/form-data`, field `csvFile`); they connect in the background, so wait for `sendingEnabled: true` before using them in a sequence.
 - **Forward content is optional**: `POST /inbox/:messageId/forward` uses the original email body when `content` is omitted.
 - **Archiving is done via dedicated archive routes**: `PATCH /lists/:id`, `PATCH /templates/:id`, and `PATCH /sequences/:id` ignore the `archived` field. Use `PUT /lists/:id/archive`, `PUT /templates/:id/archive`, and `PUT /sequences/:id/archive` instead.
 - **Folder types matter**: General folders (created without a `type`) hold lists, templates, and sequences. `type: "email-sender"` folders hold email senders only. The API rejects a folder assignment to the wrong resource type.
@@ -145,7 +147,7 @@ Read the relevant reference file before performing operations in that domain:
   - Use these endpoints when the user wants to organize resources into folders. Folders have a type (`general` or `email-sender`) and group related resources together for easier management.
 
 - **Domains & signatures** → [references/account-config.md](references/account-config.md)
-  - Use these endpoints when the user wants to view account-level configuration. Custom tracking domains are used for click tracking in emails. Signatures are appended to outgoing emails.
+  - Use these endpoints when the user wants to view account-level configuration. Custom tracking domains are used for click tracking in emails (returns both verified and unverified domains with DNS setup instructions and "not verified" tags). Signatures are appended to outgoing emails.
 
 - **DFY domains & mailboxes** → [references/dfy.md](references/dfy.md)
   - Use these endpoints when the user wants to purchase domains and provision mailboxes through the Done-For-You service. Start with `/domains/search` to find available domains, then place an order with Google Workspace, Outlook, or Azure mailboxes. Supports buying new domains or connecting existing ones.

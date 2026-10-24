@@ -90,7 +90,7 @@ Body:
   "steps": [
     { "type": "email", "template_id": "TEMPLATE_1_ID" },
     { "type": "delay", "days": 3 },
-    { "type": "email", "template_id": "TEMPLATE_2_ID" }
+    { "type": "email", "template_id": "TEMPLATE_2_ID", "send_as": "followup" }
   ],
   "paused": false,
   "launchTimingMode": "schedule",
@@ -127,7 +127,7 @@ Body:
   "steps": [
     { "type": "email", "template_id": "NEW_TEMPLATE_ID" },
     { "type": "delay", "days": 5 },
-    { "type": "email", "template_id": "FOLLOW_UP_TEMPLATE_ID" }
+    { "type": "email", "template_id": "FOLLOW_UP_TEMPLATE_ID", "send_as": "followup" }
   ]
 }
 ```

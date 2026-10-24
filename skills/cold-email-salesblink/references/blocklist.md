@@ -24,10 +24,10 @@ Query params:
 
 | Param | Type | Description |
 |-------|------|-------------|
-| `limit` | integer | Maximum number of results (default: 50) |
-| `skip` | integer | Offset for pagination |
+| `limit` | integer | Maximum number of results (default: 50, capped at 100) |
+| `skip` | integer | Offset for pagination — must be a multiple of `limit` (e.g. with `limit=50` use `skip=0`, `50`, `100`, …); non-multiples are rejected with a 400 error |
 | `search` | string | Search query |
-| `type` | string | Filter by `email` or `domain` |
+| `type` | string | Filter by entry type: `email` or `domain` |
 
 ## Add to Blocklist
 

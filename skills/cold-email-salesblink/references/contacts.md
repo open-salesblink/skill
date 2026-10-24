@@ -4,7 +4,7 @@
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/lists/:id/leads` | GET | Get leads in a list (paginated) |
+| `/lists/:id/leads` | GET | Get leads in a list (paginated, supports `sequence` + `status` filters) |
 | `/contacts` | POST | Add up to 500 leads to a list |
 | `/contacts/remove` | POST | Remove a single lead by email from a list |
 | `/leads/:id` | PATCH | Update lead fields |
@@ -52,7 +52,9 @@ Adds the lead to the global unsubscribe list and cancels pending tasks across al
 Headers:
 - `Authorization`: `SALESBLINK_API_KEY`
 
-Query params: `limit` (max 100), `skip`
+Query params: `limit` (max 100), `skip`, `search`, `archived`, `sort` (`asc`/`desc`), `sequence`, `status`
+
+The `status` filter (`not_contacted`, `contacted`, `opened`, `clicked`, `replied`, `bounced`, `unsubscribed`) works with or without `sequence`. Without it, the status matches across all sequences (e.g. `replied` = replied in any sequence); `not_contacted` matches leads with no activity in any sequence. Omit `status` (or use `all`) to return the full list.
 
 ## Add Contacts
 

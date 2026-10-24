@@ -84,7 +84,7 @@ export SALESBLINK_API_KEY="key-****"
 
 - **Cold email campaigns** — build sequences, write templates, and launch outreach
 - **Lead management** — create lists, import contacts in bulk, move and update leads
-- **Sender management** — connect Gmail/Outlook via OAuth; SMTP/IMAP and bulk CSV through the SalesBlink web UI
+- **Sender management** — connect Gmail/Outlook via OAuth; add SMTP/IMAP senders directly or in bulk from a CSV
 - **Inbox & replies** — read threads, reply to prospects, mark conversations
 - **Analytics** — track opens, clicks, replies, and sent events
 - **Deliverability testing** — run inbox placement tests across providers

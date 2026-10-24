@@ -7,7 +7,7 @@
 | `/sequences` | GET | List all sequences. Query: `limit`, `skip`, `owned_by`, `status` (`running`, `paused`, `completed`, `needs-attention`), `folder`, `sendAll`, `sortBy`, `sortType`, `search` |
 | `/sequences/:id` | GET | Get sequence details including the internal `flowchart` object |
 | `/sequences/:id/stats` | GET | Get performance analytics. Query: `from`, `to`, `sender` (filter ignored by current API) |
-| `/sequences/:id/leads` | GET | List leads in a sequence |
+| `/sequences/:id/leads` | GET | List leads in a sequence (supports `status` filter) |
 | `/sequences/:id/leads/:leadId/messages` | GET | Message history for a lead in a sequence |
 | `/sequences/:id/leads/:leadId/unsubscribe` | POST | Remove a lead from a sequence |
 | `/sequences/:id/export` | GET | Export sequence leads as CSV |
@@ -59,7 +59,7 @@ Body:
   "steps": [
     { "type": "email", "template_id": "507f1f77bcf86cd799439011" },
     { "type": "delay", "days": 3 },
-    { "type": "email", "template_id": "507f1f77bcf86cd799439012" }
+    { "type": "email", "template_id": "507f1f77bcf86cd799439012", "send_as": "followup" }
   ],
   "paused": false,
   "launchTimingMode": "schedule",
@@ -127,13 +127,15 @@ Required fields marked with ✅:
 "steps": [
   { "type": "email", "template_id": "507f1f77bcf86cd799439011" },
   { "type": "delay", "days": 3 },
-  { "type": "email", "template_id": "507f1f77bcf86cd799439012" }
+  { "type": "email", "template_id": "507f1f77bcf86cd799439012", "send_as": "followup" }
 ]
 ```
 
-- `type: "email"` → MUST include `template_id` (the template's MongoDB ObjectId).
-- `type: "delay"` → MUST include `days` (integer, number of days to wait).
+- `type: "email"` → MUST include `template_id` (the template's MongoDB ObjectId). MAY include `send_as`: `"new"` (default) sends a fresh thread; `"followup"` sends the email as a reply in the lead's existing thread (`"Re: <original subject>"`).
+- `send_as: "followup"` is ignored on the **first email step** of the sequence — there is no previous thread to reply to, so it always sends as a new thread. Only steps after the first email can follow up.
+- `type: "delay"` → MUST include `days` (integer, number of days to wait). `send_as` is not valid on delay steps.
 - Omitting `type` or misspelling it will fail or create a broken sequence.
+- The stored value is readable back on `GET /sequences/:id` as `flowchart.nodes[].data.send_as` (`{ "label": "RE: Follow Up", "value": "followup" }`); nodes without `send_as` send as new threads.
 
 **Default `emailSendingHours`:**
 ```json
@@ -210,7 +212,9 @@ Archiving a sequence automatically pauses it and removes pending email tasks.
 Headers:
 - `Authorization`: `SALESBLINK_API_KEY`
 
-Query params: `limit` (max 500), `skip`
+Query params: `limit` (max 500), `skip`, `status` (`not_contacted`, `contacted`, `opened`, `clicked`, `replied`, `bounced`, `unsubscribed`)
+
+The status filter works in two scopes: `not_contacted` (first email not yet sent) and `contacted` (first email sent) are evaluated on the lead's first-outreach task. `opened`, `clicked`, `replied`, `bounced` and `unsubscribed` match engagement recorded on any step of the sequence, so leads who engaged with a follow-up step are included.
 
 Response: `{ success, data: [...], count, total, skip, limit }`
 

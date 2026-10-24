@@ -15,20 +15,22 @@ Get a key at: https://run.salesblink.io/account/integration/api
 ## Gotchas
 
 - **ID types matter**: Templates and contact archive use MongoDB ObjectId (24-char hex). All other entities use UUID v4.
-- **GET `/lists/:id` returns an array**: The API returns a single-element array `[{ ... }]` even though the path looks like a single-resource endpoint. Extract the first item.
-- **Sequence status filters differ by endpoint**: `GET /sequences` uses status values `running`, `paused`, `completed`, `needs-attention`. `POST /sequences/:id/status` uses `ACTIVE`, `PAUSED`, `STOPPED`, `ARCHIVED`. Do not mix them up.
+- **GET `/lists/:id` returns a single object**: The V1 endpoint returns the list directly (already flattened from the internal single-element array) — do NOT extract `data[0]`. Access fields straight from `data`.
+- **Sequence status filters differ by endpoint**: `GET /sequences` uses status values `running`, `paused`, `completed`, `needs-attention`. `POST /sequences/:id/status` uses `ACTIVE`, `PAUSED`, `STOPPED`, `ARCHIVED`. Do not mix them up. Separately, `GET /sequences/:id/leads` accepts a lead-level `status` filter (`not_contacted`, `contacted`, `opened`, `clicked`, `replied`, `bounced`, `unsubscribed`): `not_contacted`/`contacted` are evaluated on the lead's first-outreach task (first email not yet sent / sent), while `opened`/`clicked`/`replied`/`bounced`/`unsubscribed` match engagement recorded on any step of the sequence.
+- **Lead `status` filter on `GET /lists/:id/leads` works with or without `sequence`**: without it, the status matches across all sequences (e.g. `replied` = replied in any sequence); omit `status` (or use `all`) for the full list.
 - **GET `/sequences/:id` returns the internal flowchart**: The response includes the full internal `flowchart` object, not a simplified step list. Use `flowchart` to inspect steps.
 - **POST `/sequences/:id/clone` returns `clonedSequenceId`**: The response shape is `{ success, data: { clonedSequenceId }, message }`, not `data.id` or `data.name`.
 - **OAuth `redirectUrl` is ignored**: The API does not use a custom `redirectUrl` for `/oauth/google` or `/oauth/outlook`. The response field is `data.auth_url`, not `data.url`.
 - **messageId** is the RFC822 Message-ID (e.g. `<id@domain.com>`) or Microsoft Graph ID. **Crucial:** Always URL-encode this ID when using it as a path parameter (e.g. in `/inbox/:messageId/thread`). This is distinct from the internal UUID `id`.
 - **`senders` is a comma-separated string**, not an array. It can mix sender IDs and folder IDs — the server auto-detects each.
 - **Sequence `steps` fully replace on PATCH**. Send the complete desired array.
+- **Email steps accept `send_as: "new" | "followup"`**: `"followup"` replies in the lead's existing thread (`Re: <original subject>`); it is ignored on the first email step, which always starts a new thread. The stored value reads back as `flowchart.nodes[].data.send_as`.
 - **Verification flags are IRREVERSIBLE**: `verification`, `archive_invalid`, `archive_risky` on lists can only be turned ON, never OFF.
 - **Sequences default to paused**: If `paused` is omitted on create, it defaults to `true`.
 - **`launchTimingMode: "now"` starts in 5 minutes**, not instantly.
 - **Template attachments use FormData field `attachment`** (not `attachments`). Max 3 per template.
 - **Remove template attachments via `remove_attachments`** array of file **names**.
-- **GET `/senders/connect-link` returns a login link; it does not create senders through this API gateway**. For Gmail and Outlook, use `/oauth/google` or `/oauth/outlook`, which return an `auth_url` the user must open in a browser; the sender is created automatically after OAuth completion. SMTP/IMAP and bulk CSV sender creation must be done in the SalesBlink web UI.
+- **GET `/senders/connect-link` returns a login link; it does not create a sender**. For Gmail and Outlook, use `/oauth/google` or `/oauth/outlook`, which return an `auth_url` the user must open in a browser; the sender is created automatically after OAuth completion. SMTP/IMAP senders can be added with `POST /senders/add-sender` (JSON) (the CSV endpoint `POST /senders/add-bulk-senders` needs `multipart/form-data`, which this JSON gateway cannot send; use `GET /senders/bulk-connect-link` for bulk CSV instead). Senders connect in the background, so wait for `sendingEnabled: true` before using them in a sequence.
 - **Forward content is optional**: `POST /inbox/:messageId/forward` uses the original email body when `content` is omitted.
 - **`/blocklist` CLI vocabulary maps to `/unsubscribe` endpoints**: all blocklist operations use the `/unsubscribe` public API.
 - **Archiving is done via dedicated archive routes**: `PATCH /lists/:id`, `PATCH /templates/:id`, and `PATCH /sequences/:id` ignore the `archived` field. Use `PUT /lists/:id/archive`, `PUT /templates/:id/archive`, and `PUT /sequences/:id/archive` instead.
@@ -78,7 +80,7 @@ Use `salesblink_get_reference_doc` with one of these topics before performing op
 - `contacts` — add/update/move/remove leads in lists (batch up to 500)
 - `templates` — reusable email templates with merge variables and attachments
 - `sequences` — automated email campaigns (steps, launch, pause, clone, archive)
-- `senders` — sending accounts: Gmail/Outlook OAuth via `/oauth/google` and `/oauth/outlook`; SMTP/IMAP and bulk CSV via the SalesBlink web UI
+- `senders` — sending accounts: Gmail/Outlook OAuth via `/oauth/google` and `/oauth/outlook`; SMTP/IMAP via `/senders/add-sender`; bulk CSV via `/senders/bulk-connect-link` (web UI), since the CSV upload needs `multipart/form-data`
 - `inbox` — reply threads, sent/scheduled emails, drafts, classify outcomes
 - `activity` — engagement events: sent, opens, clicks, replies
 - `analytics` — aggregated campaign stats (overall, day-wise, lead-level, per-mailbox)

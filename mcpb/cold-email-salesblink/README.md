@@ -13,7 +13,7 @@ The bundle runs a local Node.js MCP server (stdio transport) that acts as a hard
 - **Campaigns** — build multi-step email sequences, launch, pause, resume, clone, archive
 - **Leads** — create lists, bulk-import contacts (500/request), move and update leads
 - **Templates** — merge variables (`{{first_name}}`), spintax, attachments
-- **Senders** — Gmail/Outlook OAuth; SMTP/IMAP and bulk CSV through the SalesBlink web UI
+- **Senders** — Gmail/Outlook OAuth; SMTP/IMAP directly via the API; bulk CSV through the SalesBlink web UI
 - **Inbox** — reply threads, replies, forwards, outcome classification
 - **Analytics** — sent/opens/clicks/replies, overall/daily/lead-level/mailbox stats
 - **Deliverability** — inbox placement tests across providers
