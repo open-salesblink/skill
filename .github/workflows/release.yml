@@ -122,11 +122,22 @@ jobs:
             echo "cold-email-salesblink@$version is already on ClawHub."
             exit 0
           fi
-          clawhub skill publish skills/cold-email-salesblink \
+          # A version still pending ClawHub's security scans is invisible to
+          # `inspect` but rejected as a duplicate here, so treat that as done.
+          set +e
+          out=$(clawhub skill publish skills/cold-email-salesblink \
             --version "$version" \
             --name "Cold Email Campaigns with SalesBlink" \
             --changelog "See https://github.com/${GITHUB_REPOSITORY}/releases/tag/${TAG}" \
             --source-repo "$GITHUB_REPOSITORY" \
             --source-commit "$(git rev-parse HEAD)" \
             --source-ref "$TAG" \
-            --source-path skills/cold-email-salesblink
+            --source-path skills/cold-email-salesblink 2>&1)
+          status=$?
+          set -e
+          echo "$out"
+          if [ $status -ne 0 ] && echo "$out" | grep -q "Version $version already exists"; then
+            echo "::notice::cold-email-salesblink@$version was already submitted to ClawHub."
+            exit 0
+          fi
+          exit $status
