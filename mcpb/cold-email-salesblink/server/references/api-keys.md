@@ -32,7 +32,7 @@ Headers:
   "success": true,
   "message": "Please manage API keys through the SalesBlink web UI.",
   "data": {
-    "login_link": "https://run.salesblink.io/magic?token=...&redirect=%2Faccount%2Fintegration%2Fapi",
+    "login_link": "https://run.salesblink.io/magic?code=sc_...&redirect=%2Faccount%2Fintegration%2Fapi",
     "destination": "/account/integration/api",
     "purpose": "manage_api_keys"
   }
@@ -53,7 +53,7 @@ Headers:
   "success": true,
   "message": "Please refresh API keys through the SalesBlink web UI.",
   "data": {
-    "login_link": "https://run.salesblink.io/magic?token=...&redirect=%2Faccount%2Fintegration%2Fapi",
+    "login_link": "https://run.salesblink.io/magic?code=sc_...&redirect=%2Faccount%2Fintegration%2Fapi",
     "destination": "/account/integration/api",
     "purpose": "manage_api_keys"
   }

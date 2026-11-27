@@ -15,7 +15,7 @@ Response:
   "success": true,
   "message": "Add card login link generated successfully",
   "data": {
-    "login_link": "https://run.salesblink.io/magic?token=...&redirect=%2Faccount%2Fbilling%3Ftab%3Dcard",
+    "login_link": "https://run.salesblink.io/magic?code=sc_...&redirect=%2Faccount%2Fbilling%3Ftab%3Dcard",
     "destination": "/account/billing?tab=card",
     "purpose": "add_card"
   }
@@ -37,7 +37,7 @@ Response:
   "success": true,
   "message": "Remove card login link generated successfully",
   "data": {
-    "login_link": "https://run.salesblink.io/magic?token=...&redirect=%2Faccount%2Fbilling%3Ftab%3Dcard",
+    "login_link": "https://run.salesblink.io/magic?code=sc_...&redirect=%2Faccount%2Fbilling%3Ftab%3Dcard",
     "destination": "/account/billing?tab=card",
     "purpose": "remove_card"
   }

@@ -47,9 +47,9 @@ Response (`LoginLinkResponse`):
 ```json
 {
   "success": true,
-  "message": "Please connect your email sender through the SalesBlink web UI.",
+  "message": "Please connect your mailbox through the SalesBlink web UI.",
   "data": {
-    "login_link": "https://run.salesblink.io/magic?token=eyJ...&redirect=%2Foutreach%2Femail-senders%3Faddsenders%3Dtrue",
+    "login_link": "https://run.salesblink.io/magic?code=sc_...&redirect=%2Foutreach%2Femail-senders%3Faddsenders%3Dtrue",
     "destination": "/outreach/email-senders?addsenders=true",
     "purpose": "connect_sender"
   }
@@ -165,7 +165,7 @@ Errors:
 | Status | `message` | Cause |
 |--------|-----------|-------|
 | 400 | `from_email is required` (likewise `password`, `smtp_host`, `smtp_port`) | Missing required field |
-| 403 | `Email sender limit reached. Limit: N` | The plan's sender limit is used up |
+| 403 | `Mailbox limit reached. Limit: N` | The plan's mailbox limit is used up |
 | 409 | `Sender already in use` | That address is already connected to SalesBlink, in this or another account, including as a Gmail/Outlook OAuth sender |
 
 ### After adding a sender
@@ -241,8 +241,8 @@ Errors:
 | Status | `message` |
 |--------|-----------|
 | 400 | `csvFile is required (multipart/form-data)` |
-| 403 | `Bulk sender upload is not available on your plan.` |
-| 403 | `Email sender limit reached. Limit: N` (checked before the upload) |
+| 403 | `Bulk mailbox upload is not available on your plan.` |
+| 403 | `Mailbox limit reached. Limit: N` (checked before the upload) |
 
 ## Sender Lifecycle & Diagnostics
 
@@ -304,7 +304,7 @@ Calling **GET** `/senders/bulk-connect-link` returns a magic login link to the e
   "success": true,
   "message": "Please upload senders in bulk through the SalesBlink web UI.",
   "data": {
-    "login_link": "https://run.salesblink.io/magic?token=...&redirect=%2Foutreach%2Femail-senders%3Faddsenders%3Dtrue",
+    "login_link": "https://run.salesblink.io/magic?code=sc_...&redirect=%2Foutreach%2Femail-senders%3Faddsenders%3Dtrue",
     "destination": "/outreach/email-senders?addsenders=true",
     "purpose": "bulk_upload_senders"
   }
@@ -326,16 +326,38 @@ Pass any of the fields below to update specific sender settings. Only provided f
 | Field | Type | Description |
 |-------|------|-------------|
 | `warmup_enabled` | boolean | Enable/disable warmup |
-| `warmup_urls` | array | Warmup link URLs |
-| `warmup_templates` | array | Warmup template IDs |
-| `auto_ramp_up_enabled` | boolean | Enable auto ramp-up |
-| `ramp_up_frequency` | integer | Ramp-up increment |
-| `max_daily_frequency` | integer | Max daily warmup emails |
-| `starting_warmup_frequency` | integer | Starting warmup frequency |
-| `open_rate` | integer | Target open rate % |
-| `spam_protection` | integer | Spam protection level |
-| `read_emulation` | integer | Read emulation level |
-| `warmup_keyword` | string | Warmup keyword/tag |
+| `warmup_urls` | string[] | Warmup link IDs (the `id` values from `GET /warmup-links`) to insert into warmup emails. An empty array removes all links. Requires a plan with warmup links |
+| `warmup_templates` | string[] | IDs of this workspace's email templates to warm up. An empty array removes all. Requires a plan with warmup templates |
+| `auto_ramp_up_enabled` | boolean | Ramp up daily: the limit starts at `starting_warmup_frequency` and grows by `ramp_up_frequency` each day up to `max_daily_frequency` |
+| `ramp_up_frequency` | integer | Daily increment when auto ramp-up is on (1–50) |
+| `max_daily_frequency` | integer | Daily warmup limit (1–50). With auto ramp-up off this is the daily limit; with it on, the ceiling |
+| `starting_warmup_frequency` | integer | Initial daily limit when auto ramp-up is on (1–50) |
+| `open_rate` | integer | Open rate % (1–100) |
+| `spam_protection` | integer | Spam protection % (1–100) |
+| `read_emulation` | integer | Read emulation % (1–100) |
+| `warmup_keyword` | string | Warmup filter tag: two words joined by a dash, e.g. `blue-river`. Included in every warmup email so warmup emails can be filtered in the mailbox |
+| `warmup_schedule` | object \| null | Days and time slots when warmup emails and replies may be sent (see below) |
+
+#### Warmup schedule
+
+```json
+{
+  "warmup_schedule": {
+    "enabled": true,
+    "timezone": "America/New_York",
+    "days": [
+      { "name": "Monday", "enabled": true, "slots": [{ "fromTime": "09:00", "toTime": "17:00" }] },
+      { "name": "Saturday", "enabled": false }
+    ]
+  }
+}
+```
+
+- `enabled` is required. `null` or `enabled: false` switches the schedule off (warmup sends throughout the day) and keeps the stored days.
+- `timezone`: IANA timezone the slot times are in. Omitted: keeps the stored timezone (UTC if none).
+- `days`: `name` is `Sunday`–`Saturday`. Omitted: keeps the stored days. An enabled day needs 1–4 non-overlapping `slots`.
+- `fromTime` is a whole hour from `00:00` to `23:00`; `toTime` is a whole hour from `01:00` to `24:00`, after `fromTime`.
+- The same shape is returned as `warmupSchedule` in `GET /senders`.
 
 ### Sequence / sending fields
 

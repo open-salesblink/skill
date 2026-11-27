@@ -34,7 +34,7 @@ List custom tracking domains for the account. Both verified and unverified domai
 - **Unverified domains**: have `verified: false`, `status: "not verified"`, `tag: "not verified"`, and include DNS setup `instructions` (`record_type`, `host`, `value`, `message`) to guide DNS configuration.
 
 ### DNS Instructions Details
-- **Root/Apex domains** (e.g. `example.com`): require an `A` record with Host `@` pointing to `143.244.213.24`.
+- **Root/Apex domains** (e.g. `example.com`): require an `A` record with Host `@` pointing to `178.105.15.117`.
 - **Subdomains** (e.g. `track.example.com`): require a `CNAME` record with Host (e.g. `track`) pointing to `cname.salesblink.io` (for click-tracker), `meet.salesblink.io` (for meet-link), or `run.salesblink.io` (for white-label).
 
 ### Response Example

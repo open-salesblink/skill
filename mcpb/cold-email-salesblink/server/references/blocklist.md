@@ -12,6 +12,8 @@ Manage account-level unsubscribes and blocklisted emails/domains.
 | `/unsubscribe/:id` | DELETE | Remove a single blocklist entry by ID |
 | `/unsubscribe` | DELETE | Delete all blocklist entries |
 | `/unsubscribe/check` | GET | Check if an email is blocked |
+| `/unsubscribe/remove/preview` | POST | Dry run of `/unsubscribe/remove`: returns the entries that would be removed |
+| `/unsubscribe/:id/delete-preview` | GET | Dry run of `DELETE /unsubscribe/:id`: returns the entry that would be deleted |
 
 ## List Blocklist
 
@@ -66,6 +68,8 @@ Body:
 | Field | Type | Req | Description |
 |-------|------|-----|-------------|
 | `emails` | string[] | ✅ | Array of emails or domains to unblock |
+
+> **Preview first**: removing an entry lets emails reach a contact who may have unsubscribed. Call **POST** `/unsubscribe/remove/preview` with the same body to see the matching entries (`data.entries[]`: `id`, `email`, `type`, `created_at`; `data.dry_run: true`) and confirm with the user before removing. For a single entry, use **GET** `/unsubscribe/:id/delete-preview`.
 
 ## Delete Blocklist Entry by ID
 

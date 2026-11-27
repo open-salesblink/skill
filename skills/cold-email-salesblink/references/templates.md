@@ -96,3 +96,16 @@ Body:
 ```json
 { "archived": true }
 ```
+
+Set `"archived": false` to unarchive.
+
+If a sequence uses the template, the request returns `409` with `code: "IN_USE"` and the sequences that use it. Nothing is changed. Tell the user which sequences use it, and only repeat the request with `"force": true` in the body (or `?force=true`) if they confirm:
+
+```json
+{
+  "success": false,
+  "code": "IN_USE",
+  "message": "...",
+  "sequences": [{ "id": "sequence_uuid", "name": "Q4 Outreach" }]
+}
+```

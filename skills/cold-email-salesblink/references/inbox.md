@@ -81,6 +81,8 @@ Body:
 
 > If `email` is omitted, the email is forwarded to the original contact. If `content` is omitted, the original email body is forwarded as-is.
 
+> **Blocklisted recipients are refused**: if any recipient (to, the lead's current address, cc or bcc) or its domain is on the blocklist or has unsubscribed, the API returns `403` with `"This recipient is on your blocklist or has unsubscribed, so the email wasn't sent."`. If the blocklist can't be checked, it returns `503` and nothing is sent; retry later.
+
 ## Reply to Email
 
 **POST** `/inbox/:messageId/reply`
@@ -111,6 +113,8 @@ Body:
 > Attachments are supported via FormData field `attachment`. Base64 images in HTML are automatically uploaded to S3.
 > The reply is automatically sent from the same sender that originally contacted the lead.
 
+> **Blocklisted recipients are refused**: if any recipient (to, the lead's current address, cc or bcc) or its domain is on the blocklist or has unsubscribed, the API returns `403` with `"This recipient is on your blocklist or has unsubscribed, so the email wasn't sent."`. If the blocklist can't be checked, it returns `503` and nothing is sent; retry later.
+
 ## Update Mail State
 
 **PATCH** `/inbox/:messageId`
@@ -134,4 +138,4 @@ Body:
 | `unread`  | boolean | Mark as read (`false`) or unread (`true`)                                                                                                                                |
 | `outcome` | string  | Classify the reply: `"interested"`, `"not-interested"`, `"automatic-response"`, `"meeting-request"`, `"out-of-office"`, `"do-not-contact"`, `"wrong-person"`, `"closed"` |
 
-> **Note:** The underlying API applies any body fields directly to the task document. Only `unread` and `outcome` are documented/stable; use other fields with caution.
+> **Note:** Unknown fields, and outcome values not in this table, return a 400 error.

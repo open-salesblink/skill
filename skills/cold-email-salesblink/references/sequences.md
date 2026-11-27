@@ -4,9 +4,9 @@
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/sequences` | GET | List all sequences. Query: `limit`, `skip`, `owned_by`, `status` (`running`, `paused`, `completed`, `needs-attention`), `folder`, `sendAll`, `sortBy`, `sortType`, `search` |
+| `/sequences` | GET | List all sequences. Query: `limit`, `skip`, `owned_by`, `status` (`running`, `paused` = launched then paused, `draft` = never launched, `completed`, `needs-attention`), `folder`, `sendAll`, `sortBy`, `sortType`, `search` |
 | `/sequences/:id` | GET | Get sequence details including the internal `flowchart` object |
-| `/sequences/:id/stats` | GET | Get performance analytics. Query: `from`, `to`, `sender` (filter ignored by current API) |
+| `/sequences/:id/stats` | GET | Get performance analytics. Query: `from`, `to`, `sender` (filter ignored by current API). `positive_replies` counts replies tagged `interested` or `meeting-request` |
 | `/sequences/:id/leads` | GET | List leads in a sequence (supports `status` filter) |
 | `/sequences/:id/leads/:leadId/messages` | GET | Message history for a lead in a sequence |
 | `/sequences/:id/leads/:leadId/unsubscribe` | POST | Remove a lead from a sequence |
@@ -29,9 +29,12 @@ Query params: `limit` (max 100), `skip`, `owned_by`, `status`, `folder`, `sendAl
 | `status` value | Meaning |
 |----------------|---------|
 | `running` | Active sequences |
-| `paused` | Paused sequences |
+| `paused` | Launched, then paused |
+| `draft` | Never launched. New sequences (created with the default `paused: true`) are drafts until launched |
 | `completed` | Sequences that have completed all sends |
 | `needs-attention` | Sequences with issues (e.g. bounces, errors) |
+
+Leave `status` out to get sequences in every status. In a response, a draft has `paused: true` and `scheduledAt: null`.
 
 ## Get Sequence by ID
 
@@ -95,7 +98,7 @@ Required fields marked with ✅:
 | `paused` | boolean | | Create in paused state (default: **true**) |
 | `launchTimingMode` | string | | `"now"` (starts in 5 mins) or `"schedule"` (requires `scheduledAt` and `timezone`) |
 | `scheduledAt` | integer \| string | | UTC timestamp in **milliseconds** (recommended). ISO 8601 strings with timezone offset are documented but are not parsed correctly by the current API. Convert the desired time to Unix milliseconds before sending. (required if `launchTimingMode = "schedule"`) |
-| `timezone` | string | | IANA timezone for sending, e.g. `"Asia/Calcutta"` or `"America/New_York"`. Required when scheduling to avoid defaulting to `"America/New_York"` |
+| `timezone` | string | | IANA timezone for sending, e.g. `"Asia/Calcutta"` or `"America/New_York"`. Required when scheduling to avoid defaulting to `"UTC"` |
 | `delayEnabled` | boolean | | Enable random delay between emails (default: true) |
 | `delayFrom` | integer | | Minimum delay in minutes (default: 10) |
 | `delayTo` | integer | | Maximum delay in minutes (default: 20) |
@@ -105,7 +108,9 @@ Required fields marked with ✅:
 | `bounceThreshold` | integer | | Bounces before pausing (default: 2) |
 | `bouncePause` | boolean | | Pause sequence on bounce threshold (default: false) |
 | `autoPause` | boolean | | Auto-pause on high bounce rate (default: true) |
-| `autoTagReplies` | boolean | | Auto-tag reply outcomes (default: false) |
+| `autoTagReplies` | boolean | | Tag each reply's outcome with AI (default: true when your plan includes AI reply tagging; needs `checkEmailReply`) |
+| `stopOnOutOfOffice` | boolean | | Stop the sequence for a lead when they send an out-of-office or other automatic reply. When false, the lead's next emails wait until the day after the return date in the reply (default: false) |
+| `outOfOfficeWaitDays` | integer | | If an out-of-office or automatic reply has no return date, the number of days after the reply to wait before the lead's next email, 1-90. Ignored when `stopOnOutOfOffice` is true (default: 7) |
 | `plainText` | boolean | | Send as plain text email (default: true) |
 | `auto_reply` | boolean | | Enable auto-reply detection (default: true) |
 | `matchProvider` | boolean | | Match sender email provider with recipient (default: true) |
@@ -166,7 +171,7 @@ Body:
 }
 ```
 
-Accepts the same fields as create (all optional). Additionally used to **pause/resume**.
+Accepts the same fields as create (all optional), including `stopOnOutOfOffice` and `outOfOfficeWaitDays`. Additionally used to **pause/resume**. Sequences saved before the out-of-office settings existed have no such fields; read them as `false` and `7`.
 
 > **Critical**: When updating `steps`, the entire array is **replaced** — send the full desired step list.
 

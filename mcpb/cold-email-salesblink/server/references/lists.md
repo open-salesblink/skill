@@ -22,6 +22,8 @@ Headers:
 
 > **List responses include `fields`**: an array of the list's columns (from its Complete View) in snake_case, e.g. `["first_name", "last_name", "email", "lead_score"]`. This applies to `GET /lists`, `GET /lists/:id`, and `POST /lists` responses.
 
+> **`GET /lists/:id` includes `verification_status`**: `not_required` (verification is off), `running` (leads are being verified), `paused` (pending leads are blocked, usually because the account is out of verification credits until the next month), `done` (all leads verified), or `no_leads`.
+
 ## Get Leads
 
 **GET** `/lists/:id/leads?limit=100&skip=0`
@@ -105,3 +107,14 @@ Body:
 ```
 
 Set `"archived": false` to unarchive.
+
+If a sequence uses the list, the request returns `409` with `code: "IN_USE"` and the sequences that use it. Nothing is changed. Tell the user which sequences use it, and only repeat the request with `"force": true` in the body (or `?force=true`) if they confirm:
+
+```json
+{
+  "success": false,
+  "code": "IN_USE",
+  "message": "...",
+  "sequences": [{ "id": "sequence_uuid", "name": "Q4 Outreach" }]
+}
+```

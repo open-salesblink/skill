@@ -88,6 +88,8 @@ Body:
 | `list_id` | string | ✅ | List UUID to add leads to |
 | `contacts` | object[] | ✅ | Array of lead objects (**max 500 per request**) |
 | `remove_duplicates` | boolean | | Remove duplicate emails after insert |
+| `source` | string | | Where the contacts came from: `csv_upload`, `crm_import`, `form_signup`, `existing_customer`, or `event_attendee`. Stored with the contacts only when `source_reference` is also valid |
+| `source_reference` | string | | The file, CRM, form or event the contacts came from, or how consent was obtained (max 500 characters) |
 
 Each contact object:
 
@@ -147,7 +149,7 @@ Any standard or custom contact fields can be updated. All field names **must be 
 
 Use the dedicated `starred` boolean property to mark/unmark the lead as starred; `starred` is a contact setting and is NOT added as a list column. Use `PUT /contacts/:id/archive` to archive/unarchive contacts.
 
-If updating `email`, it is automatically lowercased.
+If updating `email`, it is automatically lowercased. Returns `409` if another lead in the same list already has that email.
 
 ## Move Lead
 
@@ -165,6 +167,8 @@ Body:
 | Field | Type | Req | Description |
 |-------|------|-----|-------------|
 | `list_id` | string | ✅ | Destination list UUID |
+
+Returns `409` if the destination list already has a lead with this email; the lead is not moved.
 
 ## Archive Contact
 

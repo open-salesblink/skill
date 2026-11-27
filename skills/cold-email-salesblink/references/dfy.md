@@ -25,7 +25,7 @@ Use these endpoints to search domains and view existing Done-For-You orders.
   "success": true,
   "message": "Please place Done-For-You orders through the SalesBlink web UI.",
   "data": {
-    "login_link": "https://run.salesblink.io/magic?token=...&redirect=%2Foutreach%2Femail-senders%3Faddsenders%3Dtrue",
+    "login_link": "https://run.salesblink.io/magic?code=sc_...&redirect=%2Foutreach%2Femail-senders%3Faddsenders%3Dtrue",
     "destination": "/outreach/email-senders?addsenders=true",
     "purpose": "place_dfy_order"
   }
@@ -39,7 +39,7 @@ Use these endpoints to search domains and view existing Done-For-You orders.
   "success": true,
   "message": "Please manage mailbox subscriptions through the SalesBlink web UI.",
   "data": {
-    "login_link": "https://run.salesblink.io/magic?token=...&redirect=%2Faccount%2Fbilling%3Ftab%3Dsubscriptions",
+    "login_link": "https://run.salesblink.io/magic?code=sc_...&redirect=%2Faccount%2Fbilling%3Ftab%3Dsubscriptions",
     "destination": "/account/billing?tab=subscriptions",
     "purpose": "manage_subscriptions"
   }
@@ -119,7 +119,7 @@ Response:
   "success": true,
   "message": "Please manage your mailbox subscription from the billing page.",
   "data": {
-    "login_link": "https://run.salesblink.io/magic?token=...&redirect=%2Faccount%2Fbilling%3Ftab%3Dsubscriptions",
+    "login_link": "https://run.salesblink.io/magic?code=sc_...&redirect=%2Faccount%2Fbilling%3Ftab%3Dsubscriptions",
     "destination": "/account/billing?tab=subscriptions",
     "purpose": "manage_subscriptions"
   }

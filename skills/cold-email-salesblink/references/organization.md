@@ -85,6 +85,8 @@ Body:
 
 > **Note:** The API returns HTTP `201 Created`, not `200 OK`.
 
+> **Paid plan required:** free or expired plans get `402` with `code: "PLAN_REQUIRED_WORKSPACES"`; reaching the plan's workspace limit gets `402` with `code: "PLAN_LIMIT_WORKSPACES"`.
+
 ### Update Workspace
 
 **PATCH** `/workspaces/:id` (UUID)
