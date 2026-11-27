@@ -14,7 +14,7 @@
 | `/sequences/:id/status` | POST | Update sequence status (ACTIVE, PAUSED, STOPPED, ARCHIVED) |
 | `/sequences` | POST | Create a full sequence with steps, senders, lists |
 | `/sequences/:id` | PATCH | Update settings, pause/resume, rewrite steps |
-| `/sequences/:id/clone` | POST | Duplicate an existing sequence (created paused) |
+| `/sequences/:id/clone` | POST | Duplicate an existing sequence (the clone is a draft) |
 | `/sequences/:id/archive` | PUT | Archive or unarchive a sequence |
 
 ## Get Sequences
@@ -34,7 +34,7 @@ Query params: `limit` (max 100), `skip`, `owned_by`, `status`, `folder`, `sendAl
 | `completed` | Sequences that have completed all sends |
 | `needs-attention` | Sequences with issues (e.g. bounces, errors) |
 
-Leave `status` out to get sequences in every status. In a response, a draft has `paused: true` and `scheduledAt: null`.
+Cloned sequences are drafts too. Leave `status` out to get every non-archived sequence (add `sendAll` to include archived ones). In a response, a draft has `paused: true` and `scheduledAt` null or absent.
 
 ## Get Sequence by ID
 
@@ -171,11 +171,11 @@ Body:
 }
 ```
 
-Accepts the same fields as create (all optional), including `stopOnOutOfOffice` and `outOfOfficeWaitDays`. Additionally used to **pause/resume**. Sequences saved before the out-of-office settings existed have no such fields; read them as `false` and `7`.
+Accepts the same fields as create (all optional), including `stopOnOutOfOffice` and `outOfOfficeWaitDays`. Additionally used to **pause/resume**. Sequences saved before the out-of-office settings existed have no such fields; read them as `false` and `7`. Send `outOfOfficeWaitDays` as a whole number from 1 to 90: update does not reject other values, and the sequence then waits the default 7 days.
 
 > **Critical**: When updating `steps`, the entire array is **replaced** — send the full desired step list.
 
-> Updates to `name`, `starred`, or `folder` do **not** trigger task rescheduling. `folder` must be a folder created without a `type` (i.e., not an email-sender folder). All other field updates do.
+> Updates to `name`, `starred`, `folder`, `stopOnOutOfOffice`, or `outOfOfficeWaitDays` do **not** trigger task rescheduling. `folder` must be a folder created without a `type` (i.e., not an email-sender folder). All other field updates do.
 
 ## Clone Sequence
 
@@ -184,7 +184,7 @@ Accepts the same fields as create (all optional), including `stopOnOutOfOffice` 
 Headers:
 - `Authorization`: `SALESBLINK_API_KEY`
 
-Creates a paused duplicate of an existing sequence.
+Creates a paused duplicate of an existing sequence. The clone has never been launched, so `GET /sequences` lists it under `draft`.
 
 Response:
 ```json

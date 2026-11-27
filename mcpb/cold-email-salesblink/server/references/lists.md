@@ -22,7 +22,7 @@ Headers:
 
 > **List responses include `fields`**: an array of the list's columns (from its Complete View) in snake_case, e.g. `["first_name", "last_name", "email", "lead_score"]`. This applies to `GET /lists`, `GET /lists/:id`, and `POST /lists` responses.
 
-> **`GET /lists/:id` includes `verification_status`**: `not_required` (verification is off), `running` (leads are being verified), `paused` (pending leads are blocked, usually because the account is out of verification credits until the next month), `done` (all leads verified), or `no_leads`.
+> **`GET /lists/:id` includes `verification_status`**: `not_required` (verification is off), `running` (leads are being verified), `paused` (pending leads are blocked, usually because the account is out of verification credits until the next month), `done` (all leads verified), or `no_leads` (verification is on and the list is empty).
 
 ## Get Leads
 
@@ -60,6 +60,8 @@ Required fields marked with ✅:
 | `verification` | boolean | | Enable email verification ⚠️ **IRREVERSIBLE** |
 | `archive_invalid` | boolean | | Auto-archive invalid emails ⚠️ **IRREVERSIBLE** |
 | `archive_risky` | boolean | | Auto-archive risky emails ⚠️ **IRREVERSIBLE** |
+| `source` | string | | Where the list's contacts come from: `csv_upload`, `crm_import`, `form_signup`, `existing_customer`, or `event_attendee`. Optional with an API key; **required** (400 otherwise) through the hosted SalesBlink MCP connector |
+| `source_reference` | string | | The file, CRM, form or event the contacts come from, or how consent was obtained (max 500 characters). Required together with `source` through the hosted MCP connector |
 
 ## Update List
 

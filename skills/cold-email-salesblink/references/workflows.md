@@ -103,7 +103,7 @@ Body:
 
 Goal: Duplicate an existing sequence and tweak it.
 
-### 1. Clone the sequence (creates paused copy)
+### 1. Clone the sequence (creates a paused draft copy)
 
 **POST** `/sequences/:id/clone`
 

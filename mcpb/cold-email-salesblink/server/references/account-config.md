@@ -27,8 +27,8 @@ Headers:
 
 | Query param | Type | Description |
 |-------------|------|-------------|
-| `redirect_url` | string | Relative path or full URL on the app domain to open after login. Without it, the user lands on the app's default page after sign-in. URLs on another domain are ignored |
-| `expiry_minutes` | integer | How long the link stays valid in minutes (default: 5). Values outside 1–30 are clamped |
+| `redirect_url` | string | Relative path or full URL on the app domain to open after login. Without it, the user lands on the app's default page after sign-in. A URL on another domain (or starting with `//`) is replaced with `/magic` |
+| `expiry_minutes` | integer | How long the link stays valid in minutes (default: 5). Values outside 1–30 are clamped; `0` or a non-number gives 5 |
 
 Response:
 ```json

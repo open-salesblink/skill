@@ -145,7 +145,7 @@ Response (`200`); `data` has the same shape as a `GET /senders` item and never i
 ```json
 {
   "success": true,
-  "message": "Email Sender will be connected in a few minutes.",
+  "message": "Mailbox will be connected in a few minutes.",
   "data": {
     "id": "6c1f0b8e-3a5d-4e0f-9a51-2b7d8e4c1a90",
     "smtpImapEmail": "alex@mycompany.com",
@@ -302,7 +302,7 @@ Calling **GET** `/senders/bulk-connect-link` returns a magic login link to the e
 ```json
 {
   "success": true,
-  "message": "Please upload senders in bulk through the SalesBlink web UI.",
+  "message": "Please upload mailboxes in bulk through the SalesBlink web UI.",
   "data": {
     "login_link": "https://run.salesblink.io/magic?code=sc_...&redirect=%2Foutreach%2Femail-senders%3Faddsenders%3Dtrue",
     "destination": "/outreach/email-senders?addsenders=true",
@@ -328,7 +328,7 @@ Pass any of the fields below to update specific sender settings. Only provided f
 | `warmup_enabled` | boolean | Enable/disable warmup |
 | `warmup_urls` | string[] | Warmup link IDs (the `id` values from `GET /warmup-links`) to insert into warmup emails. An empty array removes all links. Requires a plan with warmup links |
 | `warmup_templates` | string[] | IDs of this workspace's email templates to warm up. An empty array removes all. Requires a plan with warmup templates |
-| `auto_ramp_up_enabled` | boolean | Ramp up daily: the limit starts at `starting_warmup_frequency` and grows by `ramp_up_frequency` each day up to `max_daily_frequency` |
+| `auto_ramp_up_enabled` | boolean | Ramp up daily: the limit starts at `starting_warmup_frequency` and grows by `ramp_up_frequency` each day while spam placement stays low (it holds or steps back when spam rises), up to `max_daily_frequency`. Starting and ramp-up values above `max_daily_frequency` are lowered to it |
 | `ramp_up_frequency` | integer | Daily increment when auto ramp-up is on (1–50) |
 | `max_daily_frequency` | integer | Daily warmup limit (1–50). With auto ramp-up off this is the daily limit; with it on, the ceiling |
 | `starting_warmup_frequency` | integer | Initial daily limit when auto ramp-up is on (1–50) |
@@ -355,7 +355,7 @@ Pass any of the fields below to update specific sender settings. Only provided f
 
 - `enabled` is required. `null` or `enabled: false` switches the schedule off (warmup sends throughout the day) and keeps the stored days.
 - `timezone`: IANA timezone the slot times are in. Omitted: keeps the stored timezone (UTC if none).
-- `days`: `name` is `Sunday`–`Saturday`. Omitted: keeps the stored days. An enabled day needs 1–4 non-overlapping `slots`.
+- `days`: `name` is `Sunday`–`Saturday`. Omitted: keeps the stored days. An enabled day needs 1–4 non-overlapping `slots`. With `enabled: true`, at least one day must be enabled (400 otherwise).
 - `fromTime` is a whole hour from `00:00` to `23:00`; `toTime` is a whole hour from `01:00` to `24:00`, after `fromTime`.
 - The same shape is returned as `warmupSchedule` in `GET /senders`.
 
