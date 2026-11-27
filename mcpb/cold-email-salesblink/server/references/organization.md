@@ -85,7 +85,7 @@ Body:
 
 > **Note:** The API returns HTTP `201 Created`, not `200 OK`.
 
-> **Paid plan required:** free or expired plans get `402` with `"Creating workspaces needs an active paid plan. Upgrade your plan to add workspaces."`; reaching the plan's workspace limit gets `402` with `"You have reached your max workspace creation limit."`.
+> **Paid plan required:** free or expired plans get `403` with `"Your plan has expired. Please upgrade to continue."` (the plan check on every API-key v1 route); reaching the plan's workspace limit gets `402` with `"You have reached your max workspace creation limit."`.
 
 ### Update Workspace
 

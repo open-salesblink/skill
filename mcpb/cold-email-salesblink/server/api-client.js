@@ -17,9 +17,9 @@ const MAX_RESPONSE_CHARS = 100_000;
 const STATUS_HINTS = {
   400: "Bad request — re-check the payload structure against the reference doc for this endpoint.",
   401: "Unauthorized — verify the configured SalesBlink API key.",
-  403: "Forbidden — the API key's role is too low for this operation.",
+  403: "Forbidden — see message/code: role too low, API key missing a scope (INSUFFICIENT_SCOPE), plan expired or plan limit, or blocklisted recipient.",
   404: "Not found — verify the ID and endpoint path.",
-  409: "Conflict — the resource already exists, or a connection attempt failed.",
+  409: "Conflict — see message/code: already exists, connection failed, duplicate email, or IN_USE (ask the user before retrying with force).",
   429: "Rate limited — wait at least 60 seconds before retrying this request.",
   500: "SalesBlink server error — retry once after 10 seconds.",
 };

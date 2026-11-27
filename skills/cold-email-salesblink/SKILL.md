@@ -179,8 +179,8 @@ Always check the `success` boolean in the response body. A `200` status can stil
 | 200    | Success      | Check `success` field                                 |
 | 400    | Bad request  | Re-check payload structure against the reference file |
 | 401    | Unauthorized | Verify API key                                        |
-| 403    | Forbidden    | Insufficient permissions (role too low)               |
+| 403    | Forbidden    | Read message/code: role too low, key lacks a scope (INSUFFICIENT_SCOPE), plan expired or plan limit, or blocklisted recipient |
 | 404    | Not found    | Verify the ID / endpoint                              |
-| 409    | Conflict     | Resource already exists or connection failed          |
+| 409    | Conflict     | Read message/code: already exists, connection failed, duplicate email, or IN_USE (confirm with the user before `force`) |
 | 429    | Rate limited | Wait 60s, then retry                                  |
 | 500    | Server error | Retry once after 10s                                  |

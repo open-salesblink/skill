@@ -171,7 +171,7 @@ Body:
 }
 ```
 
-Accepts the same fields as create (all optional), including `stopOnOutOfOffice` and `outOfOfficeWaitDays`. Additionally used to **pause/resume**. Sequences saved before the out-of-office settings existed have no such fields; read them as `false` and `7`. Send `outOfOfficeWaitDays` as a whole number from 1 to 90: update does not reject other values, and the sequence then waits the default 7 days.
+Accepts the same fields as create (all optional), including `stopOnOutOfOffice` and `outOfOfficeWaitDays`. Additionally used to **pause/resume**. Sequences saved before the out-of-office settings existed have no such fields; read them as `false` and `7`. `outOfOfficeWaitDays` must be a whole number from 1 to 90 and `stopOnOutOfOffice` a boolean; create and update both return `400` otherwise.
 
 > **Critical**: When updating `steps`, the entire array is **replaced** — send the full desired step list.
 
