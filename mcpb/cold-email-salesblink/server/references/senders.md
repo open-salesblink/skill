@@ -335,7 +335,7 @@ Pass any of the fields below to update specific sender settings. Only provided f
 | `open_rate` | integer | Open rate % (1–100) |
 | `spam_protection` | integer | Spam protection % (1–100) |
 | `read_emulation` | integer | Read emulation % (1–100) |
-| `warmup_keyword` | string | Warmup filter tag: two words joined by a dash, e.g. `blue-river`. Included in every warmup email so warmup emails can be filtered in the mailbox |
+| `warmup_keyword` | string | Warmup filter tag, e.g. `blue-river` (non-empty, max 100 characters). Included in every warmup email so warmup emails can be filtered in the mailbox |
 | `warmup_schedule` | object \| null | Days and time slots when warmup emails and replies may be sent (see below) |
 
 #### Warmup schedule

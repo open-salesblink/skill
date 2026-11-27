@@ -88,8 +88,8 @@ Body:
 | `list_id` | string | ✅ | List UUID to add leads to |
 | `contacts` | object[] | ✅ | Array of lead objects (**max 500 per request**) |
 | `remove_duplicates` | boolean | | Remove duplicate emails after insert |
-| `source` | string | | Where the contacts came from: `csv_upload`, `crm_import`, `form_signup`, `existing_customer`, or `event_attendee`. Stored with the contacts only when `source_reference` is also valid |
-| `source_reference` | string | | The file, CRM, form or event the contacts came from, or how consent was obtained (max 500 characters) |
+| `source` | string | | Where the contacts came from: `csv_upload`, `crm_import`, `form_signup`, `existing_customer`, or `event_attendee`. Stored with the contacts only when `source_reference` is also valid. Optional with an API key; **required** (400 otherwise) through the hosted SalesBlink MCP connector |
+| `source_reference` | string | | The file, CRM, form or event the contacts came from, or how consent was obtained (max 500 characters). Required together with `source` through the hosted MCP connector |
 
 Each contact object:
 

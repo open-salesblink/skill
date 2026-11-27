@@ -27,8 +27,8 @@ Headers:
 
 | Query param | Type | Description |
 |-------------|------|-------------|
-| `redirect_url` | string | Relative path or full URL on the app domain to open after login. Defaults to `/magic` |
-| `expiry_minutes` | integer | How long the link stays valid, 1–30 minutes (default: 5) |
+| `redirect_url` | string | Relative path or full URL on the app domain to open after login. Without it, the user lands on the app's default page after sign-in. URLs on another domain are ignored |
+| `expiry_minutes` | integer | How long the link stays valid in minutes (default: 5). Values outside 1–30 are clamped |
 
 Response:
 ```json
@@ -37,10 +37,13 @@ Response:
   "message": "Login link generated successfully",
   "data": {
     "login_link": "https://run.salesblink.io/magic?code=sc_...&redirect=%2Foutreach%2Fsequences",
+    "destination": "/outreach/sequences",
     "expiry_minutes": 5
   }
 }
 ```
+
+`destination` is only present when `redirect_url` is set.
 
 > The link signs the user in to a full web session and can be used once. Give it only to the account holder, and never log or store it. Needs the `login_link` scope on a narrowed API key.
 

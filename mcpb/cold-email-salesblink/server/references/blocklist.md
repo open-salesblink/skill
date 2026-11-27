@@ -15,6 +15,10 @@ Manage account-level unsubscribes and blocklisted emails/domains.
 | `/unsubscribe/remove/preview` | POST | Dry run of `/unsubscribe/remove`: returns the entries that would be removed |
 | `/unsubscribe/:id/delete-preview` | GET | Dry run of `DELETE /unsubscribe/:id`: returns the entry that would be deleted |
 
+> **Through the hosted SalesBlink MCP connector (AI agents)**: only entries added by hand can be removed, one per request. Entries from unsubscribes, bounces or imports return `409` with `code: "BLOCKLIST_ENTRY_PROTECTED"`, and clearing the whole blocklist returns `403`. The account holder can remove those in the SalesBlink app. These limits do not apply to API-key requests.
+
+> The preview routes need the `unsubscribes.read` scope; the other write routes need `unsubscribes.write`.
+
 ## List Blocklist
 
 **GET** `/unsubscribe`

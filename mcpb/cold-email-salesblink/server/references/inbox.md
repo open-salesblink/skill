@@ -81,7 +81,7 @@ Body:
 
 > If `email` is omitted, the email is forwarded to the original contact. If `content` is omitted, the original email body is forwarded as-is.
 
-> **Blocklisted recipients are refused**: if any recipient (to, the lead's current address, cc or bcc) or its domain is on the blocklist or has unsubscribed, the API returns `403` with `"This recipient is on your blocklist or has unsubscribed, so the email wasn't sent."`. If the blocklist can't be checked, it returns `503` and nothing is sent; retry later.
+> **Blocklisted recipients are refused**: if any recipient (to, cc or bcc) or its domain is on the blocklist or has unsubscribed, the API returns `403` with `"This recipient is on your blocklist or has unsubscribed, so the email wasn't sent."`. If the blocklist can't be checked, it returns `503` and nothing is sent; retry later.
 
 ## Reply to Email
 

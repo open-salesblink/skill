@@ -30,7 +30,7 @@ Query params: `limit` (max 100), `skip`, `owned_by`, `status`, `folder`, `sendAl
 |----------------|---------|
 | `running` | Active sequences |
 | `paused` | Launched, then paused |
-| `draft` | Never launched. New sequences (created with the default `paused: true`) are drafts until launched |
+| `draft` | Never launched. A sequence created with the default `paused: true` and no schedule (`launchTimingMode` omitted or `"now"`) is a draft until launched. One created paused with `launchTimingMode: "schedule"` is listed under `paused` |
 | `completed` | Sequences that have completed all sends |
 | `needs-attention` | Sequences with issues (e.g. bounces, errors) |
 
